@@ -81,6 +81,11 @@ var FinderSchema = new Schema({
 
     lastSearchDate: {
         type: Date
+    },
+
+    explorer: {
+        type: Schema.Types.ObjectId,
+        ref: 'Actor'
     }
 
 }, {strict: false});
