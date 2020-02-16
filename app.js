@@ -2,6 +2,7 @@ var express = require('express'),
   app = express(),
   port = process.env.PORT || 8080,
   mongoose = require('mongoose'),
+  Finder = require('./api/models/finderModel'),
   Trip = require('./api/models/tripModel'),
   bodyParser = require('body-parser');
 
@@ -25,8 +26,10 @@ mongoose.connect(mongoDBURI, {
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+var routesFinders = require('./api/routes/finderRoutes')
 var routesTrips = require('./api/routes/tripRoutes');
- 
+
+routesFinders(app);
 routesTrips(app);
 
 console.log("Connecting DB to: " + mongoDBURI);
