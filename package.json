@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    "watch": "nodemon app.js localhost 8080",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

@@ -2,7 +2,9 @@ var express = require('express'),
   app = express(),
   port = process.env.PORT || 8080,
   mongoose = require('mongoose'),
+  Trip = require('./api/models/tripModel'),
   bodyParser = require('body-parser');
+
 
 // MongoDB URI building
 var mongoDBHostname = process.env.mongoDBHostname || "localhost";
@@ -22,6 +24,10 @@ mongoose.connect(mongoDBURI, {
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+var routesTrips = require('./api/routes/tripRoutes');
+ 
+routesTrips(app);
 
 console.log("Connecting DB to: " + mongoDBURI);
 mongoose.connection.on("open", function (err, conn) {
