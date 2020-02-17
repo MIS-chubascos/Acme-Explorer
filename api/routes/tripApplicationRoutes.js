@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function(app) {
-    var tripApplications = require('../controllers/tripApplicationsController');
+    var tripApplications = require('../controllers/tripApplicationController');
 
     app.route('/tripApplications')
         .get(tripApplications.getAllTripApplications)

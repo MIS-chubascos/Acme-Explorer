@@ -3,7 +3,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var FinderSchema = new Schema({
+var TripApplicationSchema = new Schema({
 
     moment: {
         type: Date,
@@ -54,4 +54,4 @@ var FinderSchema = new Schema({
 
 }, {strict: false});
 
-module.exports = mongoose.model('Finders', FinderSchema);
+module.exports = mongoose.model('TripApplications', TripApplicationSchema);
