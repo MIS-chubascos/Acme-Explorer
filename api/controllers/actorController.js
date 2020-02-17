@@ -5,7 +5,7 @@ var mongoose = require('mongoose'),
 var admin = require('firebase-admin');
 var authController = require('./authController');
 
-exports.list_all_actors = function (req, res) {
+exports.listAllActors = function (req, res) {
     Actor.find({}, function (err, actors) {
         if (err) {
             res.send(err);
@@ -16,7 +16,7 @@ exports.list_all_actors = function (req, res) {
     });
 };
 
-exports.login_an_actor = async function (req, res) {
+exports.loginAnActor = async function (req, res) {
     console.log('starting login');
     var emailParam = req.query.email;
     var password = req.query.password;
@@ -63,7 +63,7 @@ exports.login_an_actor = async function (req, res) {
 };
 
 //Should be an admin
-exports.create_an_actor = function (req, res) {
+exports.createAnActor = function (req, res) {
     var new_actor = new Actor(req.body);
     new_actor.save(function (error, actor) {
         if (error) {
@@ -75,7 +75,7 @@ exports.create_an_actor = function (req, res) {
     });
 };
 //Should be an admin
-exports.read_an_actor = function (req, res) {
+exports.readAnActor = function (req, res) {
     Actor.findById(req.params.actorId, function (err, actor) {
         if (err) {
             res.send(err);
@@ -87,7 +87,7 @@ exports.read_an_actor = function (req, res) {
 };
 
 //Should be an admin (?) himself
-exports.update_an_actor = function (req, res) {
+exports.updateAnActor = function (req, res) {
     Actor.findById(req.params.actorId, function (err, actor) {
         if (err) {
             res.send(err);
@@ -111,7 +111,7 @@ exports.update_an_actor = function (req, res) {
     });
 };
 
-exports.validate_an_actor = function (req, res) {
+exports.validateAnActor = function (req, res) {
     //Check Admin. If not -> res.status(403); "valid access token. Required higher privileges"
     console.log("Validating an actor with id: " + req.params.actorId)
     Actor.findOneAndUpdate({ _id: req.params.actorId }, { $set: { "validated": "true" } }, { new: true }, function (err, actor) {
@@ -125,7 +125,7 @@ exports.validate_an_actor = function (req, res) {
 };
 
 //Should be an admin (?) himself (?) owe bills
-exports.delete_an_actor = function (req, res) {
+exports.deleteAnActor = function (req, res) {
     Actor.remove({
         _id: req.params.actorId
     }, function (err, actor) {

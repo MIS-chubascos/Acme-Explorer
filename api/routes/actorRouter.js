@@ -14,8 +14,8 @@ module.exports = function (app) {
      *   @url /v1/actors
      **/
     app.route('/v1/actors')
-        .get(actor.list_all_actors)
-        .post(actor.create_an_actor)
+        .get(actor.listAllActors)
+        .post(actor.createAnActor)
     /**
      * Put an actor
      *   RequiredRoles: be the proper actor
@@ -29,9 +29,9 @@ module.exports = function (app) {
      * @url /v1/actors/:actorId
      */
     app.route('/v1/actors/actorId')
-        .get(actor.read_an_actor)
-        .put(actor.update_an_actor)
-        .delete(actor.delete_an_actor)
+        .get(actor.readAnActor)
+        .put(actor.updateAnActor)
+        .delete(actor.deleteAnActor)
 
     /**
    * Put an actor
