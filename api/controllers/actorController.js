@@ -1,7 +1,8 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-    Actor = mongoose.model('Actor');
+    Actor = mongoose.model('Actor'),
+    TripApplication = mongoose.model('TripApplications');;
 var admin = require('firebase-admin');
 var authController = require('./authController');
 
@@ -134,6 +135,34 @@ exports.deleteAnActor = function (req, res) {
         }
         else {
             res.json({ message: 'actor successfully deleted' });
+        }
+    });
+};
+
+
+
+
+
+exports.getTripApplicationsByManager = function(req, res) {
+    //Check if the user is a manager and if not: res.status(403); "only managers can list their applications"
+    TripApplication.find(function(err, tripApplications) { // filter by manager
+        if (err) {
+            res.status(500).send(err);
+
+        } else {
+            res.send(tripApplications);
+        }
+    });
+};
+
+exports.getTripApplicationsByExplorer = function(req, res) {
+    //Check if the user is an explorer and if not: res.status(403); "only explorers can list their applications"
+    TripApplication.find(function(err, tripApplications) { // {explorer: explorerId} and group by
+        if (err) {
+            res.status(500).send(err);
+
+        } else {
+            res.send(tripApplications);
         }
     });
 };
