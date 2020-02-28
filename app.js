@@ -9,10 +9,15 @@ var express = require('express'),
 
 
 // MongoDB URI building
+var mongoDBUser = process.env.mongoDBUser || "myUser";
+var mongoDBPass = process.env.mongoDBPass || "myUserPassword";
+var mongoDBCredentials = (mongoDBUser && mongoDBPass) ? mongoDBUser + ":" + mongoDBPass + "@" : "";
+
 var mongoDBHostname = process.env.mongoDBHostname || "localhost";
 var mongoDBPort = process.env.mongoDBPort || "27017";
 var mongoDBName = process.env.mongoDBName || "ACME-Explorer";
-var mongoDBURI = "mongodb://" + mongoDBHostname + ":" + mongoDBPort + "/" + mongoDBName;
+
+var mongoDBURI = "mongodb://" + mongoDBCredentials + mongoDBHostname + ":" + mongoDBPort + "/" + mongoDBName;
 
 mongoose.connect(mongoDBURI, {
     reconnectTries: 10,
@@ -21,7 +26,9 @@ mongoose.connect(mongoDBURI, {
     connectTimeoutMS: 10000, // Give up initial connection after 10 seconds
     socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
     family: 4, // skip trying IPv6
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
