@@ -15,6 +15,20 @@ exports.getAllTripApplications = function(req, res) {
     });
 };
 
+exports.getAcceptedTripApplications = function(req, res) {
+    //Check if the user is a manager and if not: res.status(403); "only managers can list accepted applications"
+    //Check if the trip is related to the manager and if not: res.status(403); "only the manager of the trip can list its applications"
+
+    TripApplication.find({trip: req.params.tripId, status: 'ACCEPTED'}, function(err, tripApplications) {
+        if (err) {
+            res.status(500).send(err);
+
+        } else {
+            res.send(tripApplications);
+        }
+    });
+};
+
 exports.getTripApplication = function(req, res) {
     //Check if the user is an explorer or a manager and if not: res.status(403); "only explorers and managers can display applications"
     //Check if the user is an explorer and the tripApplication is hers and if not: res.status(403); "explorers can only display the applications they created"
@@ -30,79 +44,35 @@ exports.getTripApplication = function(req, res) {
     });
 };
 
-exports.createTripApplication = function(req, res) {
-    //Check if the user is an explorer and if not: res.status(403); "only explorers can create applications"
-
-    var newTripApplication = new TripApplication(req.body);
-
-    var trip = await Trip.findOne({_id: req.body.trip}).exec();
-    var now = new Date();
-
-    if (trip.publicationDate > now) {
-        res.status(422).send({message: 'The corresponding trip has not been published yet'});
-
-    } else if (trip.startDate < now) {
-        res.status(422).send({message: 'The corresponding trip has already started'});
-
-    } else if (trip.cancelReason) {
-        res.status(422).send({message: 'The corresponding trip is cancelled'})
-
-    } else {
-        newTripApplication.save(function(err, tripApplication) {
-            if (err) {
-                if (err.name == 'ValidationError') {
-                    res.status(422).send(err);
-    
-                } else {
-                    res.status(500).send(err);
-                }
-    
-            } else {
-                res.json(tripApplication);
-            }
-        });
-    }
-};
-
 exports.updateTripApplication = function(req, res) {
-    //Check if the user is an explorer or a manager and if not: res.status(403); "only explorers and managers can display applications"
-    //Check if the user is an explorer and the tripApplication is hers and if not: res.status(403); "explorers can only display the applications they created"
-    //Check if the user is a manager and the tripApplication is associated to a trip she manages and if not: res.status(403); "managers can only display applications associated to the trips they manage"
+    //Check if the user is an explorer or a manager and if not: res.status(403); "only explorers and managers can update applications"
+    //Check if the user is an explorer and the tripApplication is hers and if not: res.status(403); "explorers can only update the applications they created"
+    //Check if the user is a manager and the tripApplication is associated to a trip she manages and if not: res.status(403); "managers can only update applications associated to the trips they manage"
 
     TripApplication.findById(req.params.tripApplicationId, function(err, oldTripApplication) {
         if (err) {
-            if (err.name == 'ValidationError') {
-                res.status(422).send(err);
-
-            } else {
-                res.status(500).send(err);
-            }
-
+            res.status(500).send(err);
         } else {
-            if (oldTripApplication.status == 'PENDING' && req.body.status != 'REJECTED' && req.body.status != 'DUE') { // for managers
-                res.status(422).send({message: 'Applications with status \'PENDING\' can only change to \'REJECTED\' or \'DUE\''});
 
-            } else if (oldTripApplication.status == 'PENDING' && req.body.status == 'REJECTED' && !req.body.rejectedReason) { // for managers
-                res.status(422).send({message: 'When rejecting an application you must specify a rejection reason'});
+            if ((oldTripApplication.status == 'PENDING' && req.body.status == 'REJECTED' && req.body.rejectedReason != null && req.body.paidDate == null) //check if the user is a manager
+                || (oldTripApplication.status == 'PENDING' && req.body.status == 'DUE' && req.body.rejectedReason == null && req.body.paidDate == null) //check if the user is a manager
+                || (oldTripApplication.status == 'DUE' && req.body.status == 'ACCEPTED' && req.body.rejectedReason == null && req.body.paidDate != null) //check if the user is an explorer
+                || (oldTripApplication.status == 'PENDING' && req.body.status == 'CANCELLED' && req.body.rejectedReason == null && req.body.paidDate == null) //check if the user is an explorer
+                || (oldTripApplication.status == 'ACCEPTED' && req.body.status == 'CANCELLED' && req.body.rejectedReason == null && req.body.paidDate == null)) { //check if the user is an explorer
 
-            } else if (oldTripApplication.status != 'DUE' && req.body.status == 'ACCEPTED') { // for explorers
-                res.status(422).send({message: 'Only applications with status \'DUE\' can change to \'ACCEPTED\''});
-
-            } else if (oldTripApplication.status == 'DUE' && req.body.status == 'ACCEPTED' && !req.paidDate) { // for explorers
-                res.status(422).send({message: 'When paying an application you must specify a paid date'});
-
-            } else if (oldTripApplication.status != 'PENDING' && oldTripApplication.status != 'ACCEPTED' && req.body.status == 'CANCELLED') { // for explorers
-                res.status(422).send({message: 'Only applications with status \'PENDING\' or \'ACCEPTED\' can change to \'CANCELLED\''});
-
+                    TripApplication.findOneAndUpdate({_id: req.params.tripApplicationId}, 
+                        {status: req.body.status, rejectedReason: req.body.rejectedReason, paidDate: req.body.paidDate}, 
+                        {new: true}, function(err, newTripApplication) {
+                        
+                            if (err) {
+                                res.status(500).send(err);
+            
+                            } else {
+                                res.json(newTripApplication);
+                            }
+                    });
             } else {
-                TripApplication.findOneAndUpdate({_id: req.params.tripApplicationId}, req.body, {new: true}, function(err, newTripApplication) {
-                    if (err) {
-                        res.status(500).send(err);
-
-                    } else {
-                        res.json(newTripApplication);
-                    }
-                });
+                res.status(422).send({message: 'Unsupported operation'});
             }
         }
     });

@@ -143,21 +143,18 @@ exports.deleteAnActor = function (req, res) {
 
 
 
-exports.getTripApplicationsByManager = function(req, res) {
-    //Check if the user is a manager and if not: res.status(403); "only managers can list their applications"
-    TripApplication.find(function(err, tripApplications) { // filter by manager
-        if (err) {
-            res.status(500).send(err);
-
-        } else {
-            res.send(tripApplications);
-        }
-    });
-};
-
-exports.getTripApplicationsByExplorer = function(req, res) {
+exports.getTripApplicationsByActor = function(req, res) {
     //Check if the user is an explorer and if not: res.status(403); "only explorers can list their applications"
-    TripApplication.find(function(err, tripApplications) { // {explorer: explorerId} and group by
+    var query = {};
+
+    if (req.query.explorer == "true") {
+        query.explorer = req.params.actorId;
+
+    } else {
+        query.manager = req.params.actorId;
+    }
+
+    TripApplication.find(query).sort({status: 'asc'}).exec(function(err, tripApplications) {
         if (err) {
             res.status(500).send(err);
 
