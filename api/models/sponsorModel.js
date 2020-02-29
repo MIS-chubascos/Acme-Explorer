@@ -1,54 +1,58 @@
+'use strict';
+
 var mongoose = require('mongoose');
-require('mongoose-type-url');
 var Schema = mongoose.Schema;
-const validator= require('validator');
-Actor = mongoose.model('Actor');
 
-var SponsorSchema = new Schema({
+var SponsorshipSchema = new Schema({
 
-    banner: {
-        data: Buffer,
-        contenntType: String
-    },
-    link: {
+    sponsor: {
+        type: Schema.Types.ObjectId,
+        ref: 'Actor',
+        required: 'Please, a sponsor is needed'
+      },
+    url: {
         type: String,
-        requied: 'Kindly enter the landing page',
-        validate: { 
-            validator: value => validator.isURL(value, { 
-                protocols: ['http','https','ftp'], 
-                require_tld: true, 
-                require_protocol: true 
-            }),
-            message: 'Must be a Valid URL' 
-          }
+        required: 'Please, enter the landing page',
+        validate: [validateURL,"Please, enter a valid URL"]
+      },
+    banner: {
+        data: Buffer, 
+        contentType: String
+        //required: 'Please, add an image banner'
+      },
+    trips: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Trip'
+      }],
+    flatRate:{
+        type: Number,
+        required:'Please, insert a quantity'
     },
     payed: {
         type: Boolean,
         default: false
-    },
-    sponsor: {
-        type: Schema.Types.ObjectId,
-        ref: 'Actor',
-        index:true
-    },
-    trip: {
-        type: Schema.Types.ObjectId,
-        ref: 'Trip'
-    }
-},
-{strict:false}); 
+      }
+    },   
+    { 
+        strict: false
+    });  
 
-SponsorSchema.pre('save', async function (callback) {
-    
-    const sponsor = await Actor.findById({_id: this.sponsor}); 
-    if (sponsor.flat_rate) {
-        console.log("Flat rate = true cuando el Sponsor ha pagado");
-        this.payed = true;
-    }else{
-        console.log("Flat rate = false si el Sponsor no ha pagado");
-    }
-    console.log(this.payed);
-    callback();
-});
+    SponsorshipSchema.index({sponsor: 1});
+    SponsorshipSchema.index({banner: 1 });
 
-module.exports = mongoose.model('Sponsor', SponsorSchema);
+    function validateURL(str) {
+        var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+        
+        if(!pattern .test(str)) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+
+    module.exports = mongoose.model('Sponsorships', SponsorshipSchema);
