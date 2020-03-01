@@ -6,7 +6,10 @@ var Utils = require('../utils');
 
 // CRUD methods
 exports.getAllTrips = function (req, res) {
-    var query = Utils.computeTripsQuery(req);
+    var query = {}
+    if (req.query.k) {
+        query['$text'] = { $search: keyword };
+    }
     Trip.find(query, function (err, trips) {
         if (err) {
             res.send(err);
@@ -15,7 +18,6 @@ exports.getAllTrips = function (req, res) {
         }
     })
 }
-
 
 exports.getTrip = function (req, res) {
     Trip.findById(req.params.tripId, function (err, trips) {
@@ -63,16 +65,13 @@ exports.deleteTrip = function (req, res) {
         if (err) {
             res.send(err);
         } else {
-            res.json({message: 'Trip successfully removed.'})
+            res.json({ message: 'Trip successfully removed.' })
         }
     })
 }
 
 
-
-
-
-exports.createTripApplication = function(req, res) {
+exports.createTripApplication = function (req, res) {
     //Check if the user is an explorer and if not: res.status(403); "only explorers can create applications"
 
     var newTripApplication = new TripApplication();
@@ -80,7 +79,7 @@ exports.createTripApplication = function(req, res) {
     newTripApplication.trip = req.params.tripId;
     //newTripApplication.explorer = explorerId //Set explorer id
 
-    Trip.findById(req.params.tripId, function(err, trip) {
+    Trip.findById(req.params.tripId, function (err, trip) {
         if (err) {
             res.status(500).send(err);
 
@@ -88,29 +87,37 @@ exports.createTripApplication = function(req, res) {
             var now = new Date();
 
             if (trip.publicationDate > now) {
-                res.status(422).send({message: 'The corresponding trip has not been published yet'});
+                res.status(422).send({ message: 'The corresponding trip has not been published yet' });
 
             } else if (trip.startDate < now) {
-                res.status(422).send({message: 'The corresponding trip has already started'});
+                res.status(422).send({ message: 'The corresponding trip has already started' });
 
             } else if (trip.cancelReason) {
-                res.status(422).send({message: 'The corresponding trip is cancelled'})
+                res.status(422).send({ message: 'The corresponding trip is cancelled' })
 
             } else {
-                newTripApplication.save(function(err, tripApplication) {
+                newTripApplication.save(function (err, tripApplication) {
                     if (err) {
                         if (err.name == 'ValidationError') {
                             res.status(422).send(err);
-            
+
                         } else {
                             res.status(500).send(err);
                         }
-            
+
                     } else {
                         res.json(tripApplication);
                     }
                 });
-            }     
+            }
         }
     });
 };
+
+// Other methods
+exports.searchTrips = function (keyword, minPrice, maxPrice, startDate, endDate) {
+    var query = Utils.computeTripsQuery(keyword, minPrice, maxPrice, startDate, endDate);
+    Trip.find(query, function (err, trips) {
+        return trips;
+    })
+}

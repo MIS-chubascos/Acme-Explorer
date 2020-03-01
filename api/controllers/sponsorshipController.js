@@ -1,12 +1,12 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-    Patrocinio = mongoose.model('Sponsorships');
+    Sponsorship = mongoose.model('Sponsorships');
 
 
 exports.create_a_sponsorship=function(req,res){
-    var new_sponsorship = new Patrocinio(req.body);
-    new_sponsorship.save(function(err,sponsorship){
+    var newSponsorship = new Sponsorchip(req.body);
+    newSponsorship.save(function(err,sponsorship){
         if(err){
             if(err.name=='ValidationError'){
                 res.status(422).send(err);
@@ -20,7 +20,7 @@ exports.create_a_sponsorship=function(req,res){
 }
 
 exports.read_a_sponsorship=function(req,res){
-    Patrocinio.findById(req.params.sponsorshipId, function(req,res){
+    Sponsorchip.findById(req.params.sponsorshipId, function(req,res){
         if(err){
             res.status(500).send(err);
         }else{
@@ -30,7 +30,7 @@ exports.read_a_sponsorship=function(req,res){
 }
 
 exports.delete_a_sponsorship=function(req,res){
-    Patrocinio.deleteOne(req.params.sponsorshipId, function(req,sponsorship){
+    Sponsorchip.deleteOne(req.params.sponsorshipId, function(req,sponsorship){
         if(err){
             res.status(500).send(err);
         }else{
@@ -40,7 +40,7 @@ exports.delete_a_sponsorship=function(req,res){
 }
 
 exports.update_a_sponsorship=function(req,res){
-    Patrocinio.findOneAndUpdate({_id: req.params.sponsorshipId}, req.body, {new:true}, function(err,sponsorship){
+    Sponsorchip.findOneAndUpdate({_id: req.params.sponsorshipId}, req.body, {new:true}, function(err,sponsorship){
         if(err){
             if(err.name=='ValidationError'){
                 res.status(422).send(err);
@@ -55,7 +55,7 @@ exports.update_a_sponsorship=function(req,res){
 
 
 exports.list_all_sponsorships=function(req,res){
-    Patrocinio.find(function(err,Sponsor){
+    Sponsorchip.find(function(err,Sponsor){
 
         if(err){
             res.status(500).send(err);

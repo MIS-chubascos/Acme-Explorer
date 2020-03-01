@@ -5,6 +5,8 @@ var express = require('express'),
   Finder = require('./api/models/finderModel'),
   Trip = require('./api/models/tripModel'),
   TripApplication = require('./api/models/tripApplicationModel'),
+  Config = require('./api/models/configModel'),
+  Sponsorship = require('./api/models/sponsorshipModel'),
   bodyParser = require('body-parser');
 
 
@@ -37,10 +39,12 @@ app.use(bodyParser.json());
 var routesFinders = require('./api/routes/finderRoutes')
 var routesTrips = require('./api/routes/tripRoutes');
 var routesTripApplications = require('./api/routes/tripApplicationRoutes');
+var routesSponsorship = require('./api/routes/sponsorshipRoutes');
 
 routesFinders(app);
 routesTrips(app);
 routesTripApplications(app);
+routesSponsorship(app);
 
 console.log("Connecting DB to: " + mongoDBURI);
 mongoose.connection.on("open", function (err, conn) {
