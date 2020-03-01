@@ -1,10 +1,8 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-    Actor = mongoose.model('Actor'),
+    Actor = mongoose.model('Actors'),
     TripApplication = mongoose.model('TripApplications');;
-var admin = require('firebase-admin');
-var authController = require('./authController');
 
 exports.listAllActors = function (req, res) {
     Actor.find({}, function (err, actors) {
@@ -153,6 +151,10 @@ exports.getTripApplicationsByActor = function(req, res) {
     });
 };
 
+/** Cube */
+exports.cubeFunction = function({explorer, period},res){
+
+}
 
 /** Log methods. We will use firebase (has not yet been taught in class) */
 

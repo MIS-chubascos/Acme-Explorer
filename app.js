@@ -7,6 +7,7 @@ var express = require('express'),
   TripApplication = require('./api/models/tripApplicationModel'),
   Config = require('./api/models/configModel'),
   Sponsorship = require('./api/models/sponsorshipModel'),
+  Actor = require('./api/models/actorModel')
   bodyParser = require('body-parser');
 
 
