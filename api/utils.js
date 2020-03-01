@@ -19,13 +19,8 @@ class Utils {
         return year + month + day + '-' + selectedChars;
     }
 
-    static computeTripsQuery(req) {
+    static computeTripsQuery(keyword, minPrice, maxPrice, startDate, endDate) {
         var query = {}
-        var keyword = req.query.k;
-        var minPrice = req.query.minPrice;
-        var maxPrice = req.query.maxPrice;
-        var startDate = req.query.startDate;
-        var endDate = req.query.endDate;
         if (keyword) {
             query['$text'] = { $search: keyword };
         }
