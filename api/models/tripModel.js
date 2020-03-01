@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var Utils = require('../utils');
 
 var StageSchema = new Schema({
     title : {
@@ -26,13 +27,20 @@ var StageSchema = new Schema({
 var TripSchema = new Schema({
     ticker : {
         type: String,
-        required: 'Kindly enter the ticker of the trip',
         unique: true,
         validate: {
             validator: function (v) {
                 return /^([12]\d{1}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01]))-[A-Z]{4}$/.test(v);
             },
             message: 'Ticker format is not valid. Must follow the pattern YYMMDD-XXXX'
+        },
+        default: function() {
+            var price = 0;
+            for (index in this.stages) {
+                stage = this.stages[index]
+                price += stage.price
+            }
+            return price;
         }
     },
     title : {
@@ -118,9 +126,24 @@ var TripSchema = new Schema({
     }
 }, {strict: false})
 
+TripSchema.index({ ticker: 'text', title: 'text', description: 'text' });
+TripSchema.index({ price: 1, startDate: 1, endDate:1 });
+
+TripSchema.pre('validate', async function (next) {
+    // Generate ticker
+    while (true) {
+        ticker = Utils.generateTicker();
+        exists = await this.constructor.exists({ 'ticker': ticker });
+        if (!exists) {
+            this.ticker = ticker;
+            break;
+        }
+    }
+    next();
+})
+
 TripSchema.pre('findOneAndUpdate', function (next) {
     this.options.runValidators = true
     next()
 })
-
 module.exports = mongoose.model('Trip', TripSchema);
