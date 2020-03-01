@@ -2,9 +2,12 @@
 
 var mongoose = require('mongoose'),
     Trip = mongoose.model('Trip');
+var Utils = require('../utils');
 
+// CRUD methods
 exports.getAllTrips = function (req, res) {
-    Trip.find({}, function (err, trips) {
+    var query = Utils.computeTripsQuery(req);
+    Trip.find(query, function (err, trips) {
         if (err) {
             res.send(err);
         } else {
@@ -13,15 +16,6 @@ exports.getAllTrips = function (req, res) {
     })
 }
 
-exports.searchTrips = function (req, res) { // Logic will be implemented in next deliverable
-    Trip.find({}, function (err, trips) {
-        if (err) {
-            res.send(err);
-        } else {
-            res.json(trips);
-        }
-    })
-}
 
 exports.getTrip = function (req, res) {
     Trip.findById(req.params.tripId, function (err, trips) {

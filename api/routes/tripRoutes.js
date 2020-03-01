@@ -4,12 +4,10 @@ module.exports = function(app) {
 
     app.route('/trips')
         .get(trips.getAllTrips)
-        .get(trips.searchTrips)
-        .post(trips.createTrip);
+        .post(trips.createTrip)
 
     app.route('/trips/:tripId')
         .get(trips.getTrip)
-        .get(trips.getTripApplications)
         .put(trips.updateTrip)
         .delete(trips.deleteTrip);
 
