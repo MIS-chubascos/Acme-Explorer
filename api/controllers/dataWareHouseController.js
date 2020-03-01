@@ -2,6 +2,7 @@ var async = require("async");
 var mongoose = require("mongoose"),
     DataWareHouse = mongoose.model("DataWareHouse"),
     TripApplication = mongoose.model("TripApplications");
+    Trip = mongoose.model("Trip");
 
 exports.listAllIndicators = function(req, res) {
     console.log("Requesting indicators");
@@ -58,8 +59,9 @@ function createDataWareHouseJob() {
 
         async.parallel([
             computeAvgMinMaxStdApplicationsPerTrip,
-            computeRatioApplicationsByStatus
-
+            computeRatioApplicationsByStatus,
+            computeAvgMinMaxStdTripsPerManager,
+            computeAvgMinMaxStdTripsPrice
         ], function(err, results) {
             if (err) {
                 console.log("Error computing datawarehouse: " + err);
@@ -112,5 +114,34 @@ function computeRatioApplicationsByStatus (callback) {
 
     ], function(err, res) {
         callback(err, res[0].ratioApplicationsByStatus)
+    });
+};
+
+function computeAvgMinMaxStdTripsPerManager (callback) {
+    Trip.aggregate([
+        {$group: {_id: "$manager", tripsPerManager: {$sum: 1}}},
+        {$group: {
+            _id: 0, 
+            avgTripsPerManager: {"$avg": "$tripsPerManager"},
+            minTripsPerManager: {"$min": "$tripsPerManager"},
+            maxTripsPerManager: {"$max": "$tripsPerManager"},
+            stdTripsPerManager: {"$stdDevPop": "$tripsPerManager"}
+        }}
+    ], function(err, res) {
+        callback(err, [res[0].avgTripsPerManager, res[0].minTripsPerManager, res[0].maxTripsPerManager, res[0].stdTripsPerManager])
+    });
+};
+
+function computeAvgMinMaxStdTripsPrice (callback) {
+    Trip.aggregate([
+        {$group: {
+            _id: 0, 
+            avgTripsPrice: {"$avg": "$price"},
+            minTripsPrice: {"$min": "$price"},
+            maxTripsPrice: {"$max": "$price"},
+            stdTripsPrice: {"$stdDevPop": "$price"}
+        }}
+    ], function(err, res) {
+        callback(err, [res[0].avgTripsPrice, res[0].minTripsPrice, res[0].maxTripsPrice, res[0].stdTripsPrice])
     });
 };

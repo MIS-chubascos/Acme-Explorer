@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 
 var DataWareHouseSchema = new mongoose.Schema({
 
+    // TripApplication
     avgMinMaxStdApplicationsPerTrip: [{
         type: Number
     }],
@@ -13,6 +14,17 @@ var DataWareHouseSchema = new mongoose.Schema({
         min: 0
     }],
 
+    // Trip
+    avgMinMaxStdTripsPerManager: [{
+        type: Number,
+        min: 0
+    }],
+    avgMinMaxStdTripsPrice: [{
+        type: Number,
+        min: 0
+    }],
+    
+    // Metadata
     computationMoment: {
         type: Date,
         default: Date.now
