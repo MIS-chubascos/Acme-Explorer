@@ -13,7 +13,7 @@ module.exports = function (app) {
      *   @type get post
      *   @url /v1/actors
      **/
-    app.route('/v1/actors')
+    app.route('/actors')
         .get(actor.listAllActors)
         .post(actor.createAnActor)
     /**
@@ -26,9 +26,9 @@ module.exports = function (app) {
      * 
      * @section actors
      * @type get put delete
-     * @url /v1/actors/:actorId
+     * @url /actors/:actorId
      */
-    app.route('/v1/actors/actorId')
+    app.route('/actors/actorId')
         .get(actor.readAnActor)
         .put(actor.updateAnActor)
         .delete(actor.deleteAnActor)
@@ -43,7 +43,7 @@ module.exports = function (app) {
 	 * @type get put
 	 * @url /v1/actors/:actorId
   */
- app.route('/v1/actors/:actorId')
+ app.route('/actors/:actorId')
  .put(authController.verifyUser(["ADMINISTRATOR", "MANAGER", "EXPLORER", "SPONSOR"]), actor.update_an_actor)
 
     
