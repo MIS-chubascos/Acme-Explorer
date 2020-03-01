@@ -52,6 +52,13 @@ var TripApplicationSchema = new Schema({
         ref: 'Actor'
     },
 
+    manager: {
+        type: Schema.Types.ObjectId,
+        ref: 'Actor'
+    }
+
 }, {strict: false});
+
+TripApplicationSchema.index({manager: 1});
 
 module.exports = mongoose.model('TripApplications', TripApplicationSchema);

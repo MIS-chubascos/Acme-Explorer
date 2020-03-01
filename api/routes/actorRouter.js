@@ -46,4 +46,7 @@ module.exports = function (app) {
  app.route('/v1/actors/:actorId')
  .put(authController.verifyUser(["ADMINISTRATOR", "MANAGER", "EXPLORER", "SPONSOR"]), actor.update_an_actor)
 
+    
+    app.route('/actors/:actorId/tripApplications')
+        .get(actor.getTripApplicationsByActor);
 };
