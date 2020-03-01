@@ -23,6 +23,16 @@ var DataWareHouseSchema = new mongoose.Schema({
         type: Number,
         min: 0
     }],
+
+    // Finder
+    avgPriceRangeFinders: [{
+        type: Number,
+        min: 0
+    }],
+
+    topFinderKeywords: [{
+        type: String
+    }]
     
     // Metadata
     computationMoment: {

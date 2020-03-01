@@ -5,6 +5,7 @@ var express = require('express'),
   Finder = require('./api/models/finderModel'),
   Trip = require('./api/models/tripModel'),
   TripApplication = require('./api/models/tripApplicationModel'),
+  Config = require('./api/models/configModel'),
   bodyParser = require('body-parser');
 
 
