@@ -5,11 +5,9 @@ module.exports = function(app) {
     app.route('/trips')
         .get(trips.getAllTrips)
         .post(trips.createTrip)
-        .get(trips.getTripsPerManagerData);
 
     app.route('/trips/:tripId')
         .get(trips.getTrip)
-        .get(trips.getTripApplications)
         .put(trips.updateTrip)
         .delete(trips.deleteTrip);
 
