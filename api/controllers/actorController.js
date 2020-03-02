@@ -202,7 +202,7 @@ function getPeriod(string){
 }
 
 //Once we have processed the date we can 
-exports.cubeData = function(req,res){
+exports.cubeDataMoney = function(req,res){
     var endDate = new Date(); //Today, the last day of the period
     var explorer = req.body.explorer; //We receive an explorer from a form
     var periodPreProcesed = req.body.period;  //We receive the period input
@@ -213,7 +213,7 @@ exports.cubeData = function(req,res){
     }else{
         var initialDay = period.initDate; //Date for making the period
     
-        var trips = TripApplication.aggregate([
+        TripApplication.aggregate([
             {
                 $match: {   //filtering the trips of the explorer by his applications
                     status:"ACCEPTED",
@@ -230,24 +230,88 @@ exports.cubeData = function(req,res){
                     sumPrice: {$sum:"price"}
                 }
             }
-        ], function(err,res){
+        ], function(err,results){
             if(err){
                 res.send(err);
             }else{
-                res(res[0]); //if all is ok, return the data 
+                res.send(results); //if all is ok, return the data 
             }
         })
     }
 }
 
-// Calculate things (here or avobe (?) )
-exports.cube=function(req,res){
+/**Given p, return the explorers e such that M[e, p] q v, where v denotes an arbitrary
+amount of money and q is a comparison operator (that is, “equal”,
+“not equal”, “greater than”, “greater than or equal”, “smaller than”, or “smaller than or equal”). */
 
+// Translate the comparator. We're gonna receive a comparator. Mongo syntax is different (== -> $eq) 
+
+function translateMongoComparator(string){
+    var res;
+    switch(string){
+        case"==":
+        res = "$eq";
+        break;
+        
+        case"!=":
+        res = "$ne";
+        break;
+        
+        case">":
+        res = "$gt";
+        break;
+        
+        case">=":
+        res = "$gte";
+        break;
+        
+        case"<":
+        res = "$lt";
+        break;
+        
+        case"<=":
+        res = "$lte";
+        break;
+        
+        default:
+        res=null;
+        break;
+    }
+    return res;
 }
 
+//We will receive something like    get all M[p,e] > V    
+exports.cubeDataComparator=function(req,res){
+    var period = req.query.period; //period asked
+    var queryComparator = req.query.comparator; //first extract the comparator requested in string
+    var comparators = ['==','!=','>','>=','<','<=']; //preventing input errors
+    var ammount = req.query.ammount; //the ammount of money 'V' asked in query
 
-
-
+    if(queryComparator.in(comparators)){ //preventing input errors
+        var queryAmmount={};
+        var comp = translateMongoComparator(queryComparator); //we need to fill a mongo query so we need to translate
+        queryAmmount[comp] = ammount; //This will build the money query we need in the form {comparator:ammount}
+        TripApplication.aggregate([  //It is easyer to rebuild the query than making a dynamic method
+            {
+                $match:{
+                    period: period,
+                    ammount: queryAmmount
+                }                         
+            }, {$group: //groups input docs by specified id expression
+                    {_id:"$explorer", explorers: {$push:"$explorer"} } },
+               {$project: //passes the doc with req fields to next stage in pipeline
+                    {_id:false, explorers: "$explorers"} }
+        ], function(err, explRes){
+            if(err){
+                res.send(err);
+            }else{
+                res.send(explRes)
+            }
+        });
+    }else{
+        res.send("Check the compaprator. Only ['==','!=','>','>=','<','<='] are supported.")
+    }
+}
 
 
 
