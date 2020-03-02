@@ -23,8 +23,9 @@
     "bcrypt": "^3.0.8",
     "cron": "^1.8.2",
     "express": "^4.17.1",
-    "mongoose": "^5.9.2",
     "mongoose-dummy": "^1.0.8",
-    "validator": "^12.2.0"
+    "validator": "^12.2.0",
+    "memory-cache": "^0.2.0",
+    "mongoose": "^5.9.2"
   }
 }

@@ -4,6 +4,7 @@ var mongoose = require("mongoose"),
     TripApplication = mongoose.model("TripApplications");
     Trip = mongoose.model("Trip");
     Actor = mongoose.model("Actor");
+    Finder = mongoose.model('Finders');
 var Utils = require('../utils');
 const dummy = require('mongoose-dummy');
 
@@ -104,7 +105,10 @@ function createDataWareHouseJob() {
             computeAvgMinMaxStdApplicationsPerTrip,
             computeRatioApplicationsByStatus,
             computeAvgMinMaxStdTripsPerManager,
-            computeAvgMinMaxStdTripsPrice
+            computeAvgMinMaxStdTripsPrice,
+            computeAvgPriceRangeFinders,
+            computeTopFinderKeywords
+
         ], function(err, results) {
             if (err) {
                 console.log("Error computing datawarehouse: " + err);
@@ -186,5 +190,26 @@ function computeAvgMinMaxStdTripsPrice (callback) {
         }}
     ], function(err, res) {
         callback(err, [res[0].avgTripsPrice, res[0].minTripsPrice, res[0].maxTripsPrice, res[0].stdTripsPrice])
+    });
+};
+
+function computeAvgPriceRangeFinders (callback) {
+    Finder.aggregate([
+        {$group: {_id: 0, avgMinPrice: {"$avg": "$minPrice"}, avgMaxPrice: {"$avg": "$maxPrice"}}},
+
+    ], function(err, res) {
+        callback(err, [res[0].avgMinPrice, res[0].avgMaxPrice])
+    });
+};
+
+function computeTopFinderKeywords (callback) {
+    Finder.aggregate([
+        {$match: {keyword: {$exists: true}}},
+        {$group: {_id: "$keyword", total: {$sum: 1}}},
+        {$sort: {"total": -1}},
+        {$limit: 10}
+
+    ], function(err, res) {
+        callback(err, res[0]._id)
     });
 };

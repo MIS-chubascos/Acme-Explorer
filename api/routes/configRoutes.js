@@ -3,7 +3,7 @@
 module.exports = function (app) {
     var config = require('../controllers/configController');
 
-    app.route('/v1/config')
+    app.route('/config')
         .get(config.getConfig)
         .put(config.updateConfig)
 }

@@ -3,7 +3,6 @@
 //Importamos mongoose
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-const validator = require('validator')
 var bcrypt = require('bcrypt')
 
 var ActorSchema = new Schema({
@@ -20,10 +19,7 @@ var ActorSchema = new Schema({
         unique: true,
         required: 'Please, enter an email',
         lowercase: true,
-        validate: {
-            validator: email => validator.isEmail(email),
-            message: '{VALUE} is not a valid email' 
-        }
+        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, '{VALUE} is not a valid email']
     },
     phoneNumber: {
         type: String
@@ -87,4 +83,4 @@ ActorSchema.pre('save', async function (callback) {
   };
 
   
-module.exports = mongoose.model('Actor', ActorSchema);
+module.exports = mongoose.model('Actors', ActorSchema);
