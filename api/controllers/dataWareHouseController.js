@@ -223,7 +223,7 @@ exports.populate = function (req, res) {
             return console.error(err);
         }
     })
-    Actor.collection.insert(dummies['configuration'], function (err, docs) {
+    Configuration.collection.insert(dummies['configuration'], function (err, docs) {
         if (err) {
             return console.error(err);
         }
