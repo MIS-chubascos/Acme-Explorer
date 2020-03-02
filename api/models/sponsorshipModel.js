@@ -20,10 +20,10 @@ var SponsorshipSchema = new Schema({
         contentType: String
         //required: 'Please, add an image banner'
       },
-    trips: [{
+    trip: {
         type: Schema.Types.ObjectId,
         ref: 'Trip'
-      }],
+      },
     flatRate:{
         type: Number,
         required:'Please, insert a quantity'
