@@ -12,7 +12,7 @@ exports.getAllFinders = function(req, res) {
             res.status(500).send(err);
 
         } else {
-            res.send(finders);
+            res.json(finders);
         }
     });
 };

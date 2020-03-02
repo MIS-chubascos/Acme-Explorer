@@ -36,27 +36,87 @@ exports.populate = function (req, res) {
     var dummies = {}
     dummies['trips'] = []
     dummies['managers'] = []
+    dummies['finders'] = []
+    dummies['explorers'] = []
+    dummies['tripApplications'] = []
+
+    // Managers
+
     for(var i = 0; i < req.query.size; i++){
         let dummyManager = dummy(Actor, {
-            ignore: ['actorType', 'banned'],
+            ignore: ['actorType', 'banned', '_id', '__v'],
             returnDate: true
         })
 
+        dummyManager._id = new mongoose.Types.ObjectId();
         dummyManager.actorType = ['MANAGER'];
+        dummyManager.__v = 0;
         dummies['managers'].push(dummyManager)
     }
+
+    // Trips
+
     for(var i = 0; i < req.query.size; i++){
         let dummyTrip = dummy(Trip, {
-            ignore: ['pictures', 'cancelReason', 'ticker', 'manager'],
+            ignore: ['pictures', 'cancelReason', 'ticker', 'manager', '_id', '__v'],
             returnDate: true
         })
 
+        dummyTrip._id = new mongoose.Types.ObjectId();
         dummyTrip.manager = dummies['managers'][Math.floor(Math.random() * req.query.size)]['_id'];
         dummyTrip.ticker = Utils.generateTicker(dummyTrip.startDate);
         dummyTrip.cancelReason = [];
         dummyTrip.endDate.setDate(dummyTrip.startDate.getDate() + 5);
         dummyTrip.publicationDate.setDate(dummyTrip.startDate.getDate() + 1);
+        dummyTrip.__v = 0;
         dummies['trips'].push(dummyTrip)
+    }
+
+    // Explorers
+
+    for(var i = 0; i < req.query.size; i++) {
+        let dummyExplorer = dummy(Actor, {
+            ignore: ['actorType', 'banned', '_id', '__v'],
+            returnDate: true
+        })
+
+        dummyExplorer._id = new mongoose.Types.ObjectId();
+        dummyExplorer.actorType = ['EXPLORER'];
+        dummyExplorer.__v = 0;
+        dummies['explorers'].push(dummyExplorer)
+    }    
+
+    // Finders
+
+    for(var i = 0; i < req.query.size; i++) {
+        let dummyFinder = dummy(Finder, {
+            ignore: ['_id', '__v'],
+            returnDate: true
+        })
+
+        dummyFinder._id = new mongoose.Types.ObjectId();
+        dummyFinder.maxPrice = dummyFinder.minPrice + 500;
+        dummyFinder.endDate.setDate(dummyFinder.startDate.getDate() + 14);
+        dummyFinder.explorer = dummies['explorers'][Math.floor(Math.random() * req.query.size)]['_id'];
+        dummies['finders'].push(dummyFinder)
+    }
+
+    // TripApplications
+
+    for(var i = 0; i < req.query.size; i++) {
+        let dummyTripApplication = dummy(TripApplication, {
+            ignore: ['moment', 'status', 'paidDate', '_id', 'rejectedReason', '__v'],
+            returnDate: true
+        })
+
+        var trip = dummies['trips'][Math.floor(Math.random() * req.query.size)];
+
+        dummyTripApplication._id = new mongoose.Types.ObjectId();
+        dummyTripApplication.status = 'PENDING';
+        dummyTripApplication.trip = trip['_id'];
+        dummyTripApplication.manager = trip['manager'];
+        dummyTripApplication.explorer = dummies['explorers'][Math.floor(Math.random() * req.query.size)];
+        dummies['tripApplications'].push(dummyTripApplication)
     }
 
     Actor.collection.insert(dummies['managers'], function (err, docs) {
@@ -65,6 +125,21 @@ exports.populate = function (req, res) {
         }
     })
     Trip.collection.insert(dummies['trips'], function (err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    Actor.collection.insert(dummies['explorers'], function(err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    Finder.collection.insert(dummies['finders'], function(err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    TripApplication.collection.insert(dummies['tripApplications'], function(err, docs) {
         if (err) {
             return console.error(err);
         }
