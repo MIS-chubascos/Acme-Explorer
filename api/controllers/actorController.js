@@ -224,16 +224,17 @@ exports.cubeData = function(req,res){
                     }
                 }
             }, {
-                $project: {  //we need the trips for calculating the total ammount of money
-                    _id:false,
-                    trips: "$trip"
+                $group: {  //we need the trips of the explorer for calculating the total ammount of money
+                    _id:"$explorer",
+                    trips: {$push:"$trip"},
+                    sumPrice: {$sum:"price"}
                 }
             }
         ], function(err,res){
             if(err){
                 res.send(err);
             }else{
-                res(res[0]); //if all is ok, return the necesary data 
+                res(res[0]); //if all is ok, return the data 
             }
         })
     }
