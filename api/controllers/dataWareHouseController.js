@@ -6,7 +6,7 @@ var mongoose = require("mongoose"),
     Actor = mongoose.model("Actors");
     Finder = mongoose.model('Finders');
     Sponsorship = mongoose.model('Sponsorships');
-    Configuration = mongoose.model('Configuration')
+    Configuration = mongoose.model('Config')
 var Utils = require('../utils');
 const dummy = require('mongoose-dummy');
 
