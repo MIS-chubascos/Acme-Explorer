@@ -151,7 +151,9 @@ exports.getTripApplicationsByActor = function(req, res) {
     });
 };
 
-/** Cube */  
+
+
+/** Cube methods */  
 
 /**Launch a process to compute a cube of the form M[e, p] that returns the amount of
 money that explorer e has spent on trips during period p, which can be M01-M36 to
@@ -201,7 +203,7 @@ function getPeriod(string){
     }
 }
 
-//Once we have processed the date we can 
+//Once we have processed the date we can perform the calculations
 exports.cubeDataMoney = function(req,res){
     var endDate = new Date(); //Today, the last day of the period
     var explorer = req.body.explorer; //We receive an explorer from a form
@@ -282,7 +284,7 @@ function translateMongoComparator(string){
 
 //We will receive something like    get all M[p,e] > V    
 exports.cubeDataComparator=function(req,res){
-    var period = req.query.period; //period asked
+    var period = req.query.period; //period in query
     var queryComparator = req.query.comparator; //first extract the comparator requested in string
     var comparators = ['==','!=','>','>=','<','<=']; //preventing input errors
     var ammount = req.query.ammount; //the ammount of money 'V' asked in query
