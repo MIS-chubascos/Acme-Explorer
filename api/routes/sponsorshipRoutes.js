@@ -4,11 +4,17 @@ module.exports = function (app) {
     var sponsorship = require('../controllers/sponsorshipController'); 
 
     app.route('/sponsor')
-        .get(sponsorship.list_all_sponsorships)
-        .post(sponsorship.create_a_sponsorship)
+        .get(sponsorship.getAllSponsorships)
+        .post(sponsorship.createSponsorship)
 
     app.route('/sponsor/:sponsorId')
-        .get(sponsorship.read_a_sponsorship)
-        .put(sponsorship.update_a_sponsorship)
-        .delete(sponsorship.delete_a_sponsorship)
+        .get(sponsorship.getSponsorship)
+        .put(sponsorship.updateSponsorship)
+        .delete(sponsorship.deleteSponsorship)
+    
+    app.route('/trips/:tripId/sponsorships')
+        .get(trips.getTripSponsorships)
+
+    app.route('/trips/:tripId/randomSponsorship')
+        .get(trips.getTripRandomSponsorship)
 };
