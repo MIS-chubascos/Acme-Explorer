@@ -55,7 +55,7 @@ exports.updateSponsorship = function(req,res){
 
 
 exports.getAllSponsorships = function(req,res){
-    Sponsorship.find(function(err,Sponsor){
+    Sponsorship.find(function(err, sponsorship){
         if(err){
             res.status(500).send(err);
         }else{

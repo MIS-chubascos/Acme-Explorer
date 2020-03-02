@@ -16,18 +16,14 @@ var SponsorshipSchema = new Schema({
         validate: [validateURL,"Please, enter a valid URL"]
       },
     banner: {
-        data: Buffer, 
-        contentType: String
+        type: Buffer, 
+        // contentType: String
         //required: 'Please, add an image banner'
       },
     trip: {
         type: Schema.Types.ObjectId,
         ref: 'Trip'
       },
-    flatRate:{
-        type: Number,
-        required:'Please, insert a quantity'
-    },
     payed: {
         type: Boolean,
         default: false

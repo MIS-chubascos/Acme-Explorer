@@ -5,6 +5,7 @@ var mongoose = require("mongoose"),
     Trip = mongoose.model("Trip");
     Actor = mongoose.model("Actors");
     Finder = mongoose.model('Finders');
+    Sponsorship = mongoose.model('Sponsorships');
 var Utils = require('../utils');
 const dummy = require('mongoose-dummy');
 
@@ -38,6 +39,8 @@ exports.populate = function (req, res) {
     dummies['managers'] = []
     dummies['finders'] = []
     dummies['explorers'] = []
+    dummies['sponsors'] = [] 
+    dummies['sponsorships'] = [] 
     dummies['tripApplications'] = []
 
     // Managers
@@ -119,6 +122,35 @@ exports.populate = function (req, res) {
         dummies['tripApplications'].push(dummyTripApplication)
     }
 
+    // Sponsors
+
+    for(var i = 0; i < req.query.size; i++) {
+        let dummySponsor = dummy(Actor, {
+            ignore: ['actorType', 'banned', '_id', '__v'],
+            returnDate: true
+        })
+
+        dummySponsor._id = new mongoose.Types.ObjectId();
+        dummySponsor.actorType = ['SPONSOR'];
+        dummySponsor.__v = 0;
+        dummies['sponsors'].push(dummySponsor)
+    }   
+
+    // Sponsorships
+
+    for(var i = 0; i < req.query.size; i++){
+        let dummySponsorship = dummy(Sponsorship, {
+            ignore: ['banner', 'sponsor', 'trip', 'payed'],
+            returnDate: true
+        })
+
+        dummySponsorship._id = new mongoose.Types.ObjectId();
+        dummySponsorship.sponsor = dummies['sponsors'][Math.floor(Math.random() * req.query.size)]['_id'];
+        dummySponsorship.trip = dummies['trips'][Math.floor(Math.random() * req.query.size)]['_id'];
+        dummySponsorship.__v = 0;
+        dummies['sponsorships'].push(dummySponsorship)
+    }
+
     Actor.collection.insert(dummies['managers'], function (err, docs) {
         if (err) {
             return console.error(err);
@@ -140,6 +172,16 @@ exports.populate = function (req, res) {
         }
     })
     TripApplication.collection.insert(dummies['tripApplications'], function(err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    Actor.collection.insert(dummies['sponsors'], function(err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    Sponsorship.collection.insert(dummies['sponsorships'], function(err, docs) {
         if (err) {
             return console.error(err);
         }
