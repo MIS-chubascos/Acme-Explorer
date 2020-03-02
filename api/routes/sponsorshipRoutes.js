@@ -3,18 +3,18 @@
 module.exports = function (app) {
     var sponsorship = require('../controllers/sponsorshipController'); 
 
-    app.route('/sponsor')
+    app.route('/sponsorships')
         .get(sponsorship.getAllSponsorships)
         .post(sponsorship.createSponsorship)
 
-    app.route('/sponsor/:sponsorId')
+    app.route('/sponsorships/:sponsorshipId')
         .get(sponsorship.getSponsorship)
         .put(sponsorship.updateSponsorship)
         .delete(sponsorship.deleteSponsorship)
     
     app.route('/trips/:tripId/sponsorships')
-        .get(trips.getTripSponsorships)
+        .get(sponsorship.getTripSponsorships)
 
     app.route('/trips/:tripId/randomSponsorship')
-        .get(trips.getTripRandomSponsorship)
+        .get(sponsorship.getTripRandomSponsorship)
 };
