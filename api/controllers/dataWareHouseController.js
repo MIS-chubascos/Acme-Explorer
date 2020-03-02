@@ -6,6 +6,7 @@ var mongoose = require("mongoose"),
     Actor = mongoose.model("Actors");
     Finder = mongoose.model('Finders');
     Sponsorship = mongoose.model('Sponsorships');
+    Configuration = mongoose.model('Configuration')
 var Utils = require('../utils');
 const dummy = require('mongoose-dummy');
 
@@ -42,6 +43,8 @@ exports.populate = function (req, res) {
     dummies['sponsors'] = [] 
     dummies['sponsorships'] = [] 
     dummies['tripApplications'] = []
+    dummies['administrators'] = []
+    dummies['configuration'] = []
 
     // Managers
 
@@ -151,6 +154,35 @@ exports.populate = function (req, res) {
         dummies['sponsorships'].push(dummySponsorship)
     }
 
+    // Admins
+
+    for(var i = 0; i < req.query.size; i++){
+        let dummyAdministrator = dummy(Actor, {
+            ignore: ['actorType', 'banned', '_id', '__v'],
+            returnDate: true
+        })
+
+        dummyAdministrator._id = new mongoose.Types.ObjectId();
+        dummyAdministrator.actorType = ['ADMINISTRATOR'];
+        dummyAdministrator.__v = 0;
+        dummies['administrators'].push(dummyAdministrator)
+    }
+
+    //Configuration (just 1)
+
+    let dummyConfiguration = dummy(Configuration, {
+        ignore: ['_id','flatRate','finderMaxResults','finderCacheTime'],
+        returnDate: true
+    })
+
+    dummyConfiguration._id = new mongoose.Types.ObjectId();
+    dummyConfiguration.__v = 0;
+    dummyConfiguration.flatRate = 2;
+    dummyConfiguration.finderMaxResult = 5;
+    dummyConfiguration.finderCacheTime = 1;
+    dummies['configuration'].push(dummyConfiguration);
+
+
     Actor.collection.insert(dummies['managers'], function (err, docs) {
         if (err) {
             return console.error(err);
@@ -182,6 +214,16 @@ exports.populate = function (req, res) {
         }
     })
     Sponsorship.collection.insert(dummies['sponsorships'], function(err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    Actor.collection.insert(dummies['administrators'], function (err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    Actor.collection.insert(dummies['configuration'], function (err, docs) {
         if (err) {
             return console.error(err);
         }
