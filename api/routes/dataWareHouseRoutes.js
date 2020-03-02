@@ -16,6 +16,9 @@ module.exports = function(app) {
 	.get(dataWareHouse.listAllIndicators)
 	.post(dataWareHouse.rebuildPeriod);
 
+	app.route('/populate')
+	.get(dataWareHouse.populate)
+
 	/**
 	 * Get a list of last computed indicator
 	 * RequiredRole: Administrator

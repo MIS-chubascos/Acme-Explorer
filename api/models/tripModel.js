@@ -43,6 +43,10 @@ var TripSchema = new Schema({
             return price;
         }
     },
+    manager: {
+        type: Schema.Types.ObjectId,
+        ref: 'Actor'
+    },
     title : {
         type: String,
         required: 'Kindly enter the title of the trip',
@@ -132,7 +136,7 @@ TripSchema.index({ price: 1, startDate: 1, endDate:1 });
 TripSchema.pre('validate', async function (next) {
     // Generate ticker
     while (true) {
-        ticker = Utils.generateTicker();
+        ticker = Utils.generateTicker(new Date());
         exists = await this.constructor.exists({ 'ticker': ticker });
         if (!exists) {
             this.ticker = ticker;
