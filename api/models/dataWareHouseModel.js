@@ -32,7 +32,7 @@ var DataWareHouseSchema = new mongoose.Schema({
 
     topFinderKeywords: [{
         type: String
-    }]
+    }],
     
     // Metadata
     computationMoment: {
