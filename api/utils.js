@@ -1,7 +1,6 @@
 class Utils {
 
-    static generateTicker() {
-        var date = new Date();
+    static generateTicker(date) {
         var day = date.getDate();
         var month = date.getMonth() + 1;
         var year = date.getFullYear().toString().substr(-2);

@@ -37,10 +37,12 @@ app.use(bodyParser.json());
 var routesFinders = require('./api/routes/finderRoutes')
 var routesTrips = require('./api/routes/tripRoutes');
 var routesTripApplications = require('./api/routes/tripApplicationRoutes');
+var routesDataWareHouse = require('./api/routes/dataWareHouseRoutes');
 
 routesFinders(app);
 routesTrips(app);
 routesTripApplications(app);
+routesDataWareHouse(app);
 
 console.log("Connecting DB to: " + mongoDBURI);
 mongoose.connection.on("open", function (err, conn) {

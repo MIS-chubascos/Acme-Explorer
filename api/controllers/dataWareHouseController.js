@@ -3,6 +3,9 @@ var mongoose = require("mongoose"),
     DataWareHouse = mongoose.model("DataWareHouse"),
     TripApplication = mongoose.model("TripApplications");
     Trip = mongoose.model("Trip");
+    Actor = mongoose.model("Actor");
+var Utils = require('../utils');
+const dummy = require('mongoose-dummy');
 
 exports.listAllIndicators = function(req, res) {
     console.log("Requesting indicators");
@@ -27,6 +30,46 @@ exports.lastIndicator = function(req, res) {
         }
     });
 };
+
+exports.populate = function (req, res) {
+    var dummies = {}
+    dummies['trips'] = []
+    dummies['managers'] = []
+    for(var i = 0; i < req.query.size; i++){
+        let dummyManager = dummy(Actor, {
+            ignore: ['actorType', 'banned'],
+            returnDate: true
+        })
+
+        dummyManager.actorType = ['MANAGER'];
+        dummies['managers'].push(dummyManager)
+    }
+    for(var i = 0; i < req.query.size; i++){
+        let dummyTrip = dummy(Trip, {
+            ignore: ['pictures', 'cancelReason', 'ticker', 'manager'],
+            returnDate: true
+        })
+
+        dummyTrip.manager = dummies['managers'][Math.floor(Math.random() * req.query.size)]['_id'];
+        dummyTrip.ticker = Utils.generateTicker(dummyTrip.startDate);
+        dummyTrip.cancelReason = [];
+        dummyTrip.endDate.setDate(dummyTrip.startDate.getDate() + 5);
+        dummyTrip.publicationDate.setDate(dummyTrip.startDate.getDate() + 1);
+        dummies['trips'].push(dummyTrip)
+    }
+
+    Actor.collection.insert(dummies['managers'], function (err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    Trip.collection.insert(dummies['trips'], function (err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    res.json(dummies);
+}
 
 
 
