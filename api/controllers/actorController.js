@@ -206,7 +206,7 @@ function getPeriod(string){
 //Once we have processed the date we can perform the calculations
 exports.cubeDataMoney = function(req,res){
     var endDate = new Date(); //Today, the last day of the period
-    var explorer = req.body.explorer; //We receive an explorer from a form
+    var explorer = req.params.explorer; //We receive an explorer from a form
     var periodPreProcesed = req.body.period;  //We receive the period input
     var period = getPeriod(periodPreProcesed); //Process the period for obtaining two dates 
 
@@ -292,8 +292,8 @@ exports.cubeDataComparator=function(req,res){
     if(queryComparator.in(comparators)){ //preventing input errors
         var queryAmmount={};
         var comp = translateMongoComparator(queryComparator); //we need to fill a mongo query so we need to translate
-        queryAmmount[comp] = ammount; //This will build the money query we need in the form {comparator:ammount}
-        TripApplication.aggregate([  //It is easyer to rebuild the query than making a dynamic method
+        queryAmmount[comp] = ammount; //This will build the money query we need in the form {comparator:ammount} {$gt:5}
+        TripApplication.aggregate([  //It is easier to rebuild the query than making a dynamic method
             {
                 $match:{
                     period: period,
