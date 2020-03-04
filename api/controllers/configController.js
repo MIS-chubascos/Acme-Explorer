@@ -18,7 +18,7 @@ exports.updateConfig = function(req, res) {
         if(err){
             res.send(err);
         }else{
-            Config.findOneAndUpdate({ _id: req.params.configId}. req.body, {new: true}, function(err,config){
+            Config.findOneAndUpdate({ _id: req.params.configId}, req.body, {new: true}, function(err,config){
                 if(err){
                     res.send(err);
                 }else{

@@ -5,5 +5,7 @@ module.exports = function (app) {
 
     app.route('/config')
         .get(config.getConfig)
+
+    app.route('/config/:configId')
         .put(config.updateConfig)
 }
