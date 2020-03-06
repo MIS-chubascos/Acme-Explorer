@@ -10,6 +10,8 @@ var express = require('express'),
   Actor = require('./api/models/actorModel'),
   DataWareHouse = require('./api/models/dataWareHouseModel'),
   bodyParser = require('body-parser');
+  admin = require('firebase-admin')
+  serviceAccount = require('./acme-explorer-dc987-firebase-adminsdk-wn4ll-55a133b081.json')
 
 
 // MongoDB URI building
@@ -45,6 +47,12 @@ var routesDataWareHouse = require('./api/routes/dataWareHouseRoutes');
 var routesSponsorship = require('./api/routes/sponsorshipRoutes');
 var routesActors = require('./api/routes/actorRoutes')
 var routesConfig = require('./api/routes/configRoutes')
+
+//From the project's firebase settings
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://acme-explorer-dc987.firebaseio.com"
+  });
 
 routesFinders(app);
 routesTrips(app);
