@@ -3,6 +3,7 @@
 var mongoose = require('mongoose'),
     Actor = mongoose.model('Actors'),
     TripApplication = mongoose.model('TripApplications');;
+var authController = require('./authController')
 
 exports.listAllActors = function (req, res) {
     Actor.find({}, function (err, actors) {
@@ -69,63 +70,73 @@ exports.updateAnActor = function (req, res) {
     });
 };
 
-// Ban/unban methods. Only for admin users
 
-exports.banActor = function(req,res){
-    //If not and admin, res.status(403); "More privileges required due to this action"
-    Actor.findOneAndUpdate({ _id: req.params.actorId},
-        { $set: {"banned": "true"}},
-            {new: true},
-            function (err,actor){
-                if (err){
-                    res.status(500).send(err);
-                }else{
-                    res.json.send(actor);
-                }
-            })
-}
-
-exports.unbanActor = function(req,res){
-    //If not and admin, res.status(403); "More privileges required due to this action"
-    Actor.findOneAndUpdate({ _id: req.params.actorId},
-        { $set: {"banned": "false"}},
-            {new: true},
-            function (err,actor){
-                if (err){
-                    res.status(500).send(err);
-                }else{
-                    res.json.send(actor);
-                }
-            })
-}
-
-exports.validateAnActor = function (req, res) {
-    //Check Admin. If not -> res.status(403); "valid access token. Required higher privileges"
-    console.log("Validating an actor with id: " + req.params.actorId)
-    Actor.findOneAndUpdate({ _id: req.params.actorId }, { $set: { "validated": "true" } }, { new: true }, function (err, actor) {
-        if (err) {
-            res.status(500).send(err);
-        }
-        else {
-            res.json(actor);
-        }
-    });
-};
-
-//Should be an admin (?) himself (?) owe bills
-exports.deleteAnActor = function (req, res) {
-    Actor.remove({
-        _id: req.params.actorId
-    }, function (err, actor) {
-        if (err) {
+exports.updateAnActorVerified = function(req,res){
+    //Actors can update themselves, admin can update anyone
+    Actor.findById(req.params.actorId, async function(err,actor){
+        if(err){
             res.send(err);
-        }
-        else {
-            res.json({ message: 'actor successfully deleted' });
-        }
+        }else{
+            var idToken = req.headers['idtoken']; //custom token in req.header created by FB
+            if(actor.actorType.includes('MANAGER')||actor.actorType.includes('EXPLORER')||actor.actorType.includes('SPONSOR')){
+                var authUserId = await authController.getUserId(idToken);
+                if(authUserId == req.params.actorId){
+                    Actor.findOneAndUpdate({_id:req.params.actorId},{name: req.body.name, 
+                        surname: req.body.surname, 
+                        phoneNumber: req.body.phoneNumber, 
+                        address: req.body.address, 
+                        password: req.body.password},
+                    {new: true,
+                        upsert: true,
+                        setDefaultsOnInsert: true,
+                        runValidators: true,
+                        context: 'query'
+                }, function (err, actor){
+                    if(err){
+                        res.send(err);
+                    }else{
+                        res.json(actor);
+                    }
+                });
+                }else{
+                    res.status(403); //Authentication error
+                    res.send('The actor is not authorised to update other than himself');
+                }
+            }else if(actor.actorType.includes('ADMINISTRATOR')){
+                Actor.findOneAndUpdate({_id:req.params.actorId},req.body,{new:true},function(err,res){
+                    if(err){
+                        res.send(err);
+                    }else{
+                        res.json(actor);
+                    }
+                });
+            }else{
+                res.status(405); //Not allowed
+                res.send('Actor has undentified roles');
+            }
+        }               
     });
-};
+}
 
+
+//Only admin can delete actors. Async function needed for authController method
+exports.deleteAnActor = async function (req, res) { 
+    var idToken = req.headers['idtoken'];
+    var authenticatedUserId = await authController.getUserId(idToken)
+    var actorAuth = actor.findById(authenticatedUserId);
+    if(actorAuth.actorType.includes('ADMINISTRATOR')){
+        Actor.remove({
+            _id: req.params.actorId
+        }, function (err, actor) {
+            if (err) {
+                res.send(err);
+            }
+            else {
+                res.json({ message: 'actor successfully deleted' });
+            }
+        });
+    };
+}
 
 
 
@@ -319,7 +330,7 @@ exports.cubeDataComparator=function(req,res){
 
 
 
-/** Log methods. We will use firebase (has not yet been taught in class) */
+/** Login method */
 
 exports.loginAnActor = async function (req, res) {
     console.log('starting login');

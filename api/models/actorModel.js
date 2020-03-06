@@ -40,6 +40,9 @@ var ActorSchema = new Schema({
         required: 'Select the type of actor please',
         enum: ['ADMINISTRATOR','MANAGER','EXPLORER','SPONSOR']
     }],
+    customToken: {
+      type: String
+    },
     },
 
     { strict: false }); //False por defecto. Posibilita pasar al modelo constructores diferentes al esquema 

@@ -47,13 +47,14 @@ var routesDataWareHouse = require('./api/routes/dataWareHouseRoutes');
 var routesSponsorship = require('./api/routes/sponsorshipRoutes');
 var routesActors = require('./api/routes/actorRoutes')
 var routesConfig = require('./api/routes/configRoutes')
+var routesLogin = require('./api/routes/loginRoutes');
 
 //From the project's firebase settings
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://acme-explorer-dc987.firebaseio.com"
   });
-
+ 
 routesFinders(app);
 routesTrips(app);
 routesTripApplications(app);
@@ -61,6 +62,7 @@ routesDataWareHouse(app);
 routesSponsorship(app);
 routesActors(app);
 routesConfig(app);
+routesLogin(app);
 
 
 console.log("Connecting DB to: " + mongoDBURI);
