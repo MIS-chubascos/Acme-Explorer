@@ -58,8 +58,8 @@ exports.verifyUser = function(requiredRoles) {
   
                 var isAuth = false;
                 for (var i = 0; i < requiredRoles.length; i++) {
-                  for (var j = 0; j < actor.role.length; j++) {
-                     if (requiredRoles[i] == actor.role[j]) {
+                  for (var j = 0; j < actor.actorType.length; j++) {
+                     if (requiredRoles[i] == actor.actorType[j]) {
                         isAuth = true;
                      }
                   }

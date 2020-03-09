@@ -48,6 +48,17 @@ mongoose.connect(mongoDBURI, {
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept, idToken" //ojo, que si metemos un parametro propio por la cabecera hay que declararlo aquí para que no de el error CORS
+    );
+    //res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
+    next();
+});
+
 var routesFinders = require('./api/routes/finderRoutes')
 var routesTrips = require('./api/routes/tripRoutes');
 var routesTripApplications = require('./api/routes/tripApplicationRoutes');
@@ -78,7 +89,7 @@ mongoose.connection.on("open", function (err, conn) {
    /* app.listen(port, function () {
         console.log('ACME-Explorer RESTful API server started on: ' + port);
     });*/
-    https.createServer(options, app).listen(port)
+   https.createServer(options, app).listen(port)
 });
 
 mongoose.connection.on("error", function (err, conn) {
