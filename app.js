@@ -13,6 +13,14 @@ var express = require('express'),
   admin = require('firebase-admin')
   serviceAccount = require('./acme-explorer-dc987-firebase-adminsdk-wn4ll-55a133b081.json')
 
+var fs = require('fs');
+var https = require('https');
+
+const options = {
+    key:fs.readFileSync('./keys/server.key'),  
+    cert: fs.readFileSync('./keys/server.cert')
+}
+
 
 // MongoDB URI building
 var mongoDBUser = process.env.mongoDBUser || "myUser";
@@ -67,11 +75,15 @@ routesLogin(app);
 
 console.log("Connecting DB to: " + mongoDBURI);
 mongoose.connection.on("open", function (err, conn) {
-    app.listen(port, function () {
+   /* app.listen(port, function () {
         console.log('ACME-Explorer RESTful API server started on: ' + port);
-    });
+    });*/
+    https.createServer(options, app).listen(port)
 });
 
 mongoose.connection.on("error", function (err, conn) {
     console.error("DB init error " + err);
 });
+
+
+
