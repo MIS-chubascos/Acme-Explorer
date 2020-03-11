@@ -9,7 +9,9 @@ export class Actor extends Entity {
     address: string;
     password: string;
     banned: Boolean;
-    actorType: [String];
+    actorType: [string];
     customToken: string;
+
+    idToken: string;
 
 }
