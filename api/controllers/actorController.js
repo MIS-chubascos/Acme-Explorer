@@ -351,7 +351,7 @@ exports.loginAnActor = async function (req, res) {
         }
         else {
             // Check the pWord
-            //console.log('actorController pWord: '+password);
+            console.log('actorController pWord: '+password);
             actor.verifyPassword(password, async function (err, isMatch) {
                 if (err) {
                     res.send(err);
