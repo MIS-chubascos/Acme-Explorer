@@ -73,8 +73,15 @@ exports.populate = function (req, res) {
         dummyTrip.ticker = Utils.generateTicker(dummyTrip.startDate);
         dummyTrip.cancelReason = [];
         dummyTrip.endDate.setDate(dummyTrip.startDate.getDate() + 5);
-        dummyTrip.publicationDate.setDate(dummyTrip.startDate.getDate() + 1);
+        dummyTrip.publicationDate.setDate(dummyTrip.startDate.getDate() - 3);
         dummyTrip.__v = 0;
+
+        totalPrice = 0
+        for (var i = 0; i < dummyTrip.stages.length; i++) {
+            dummyTrip.stages[i].order = i;
+            totalPrice += dummyTrip.stages[i].price;
+        }
+        dummyTrip.price = totalPrice;
         dummies['trips'].push(dummyTrip)
     }
 
