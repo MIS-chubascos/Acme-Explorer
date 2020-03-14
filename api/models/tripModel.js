@@ -63,15 +63,7 @@ var TripSchema = new Schema({
     price : {
         type: Number,
         required: 'Kindly enter the password of the trip',
-        min: 0,
-        default: function() {
-            var price = 0;
-            for (index in this.stages) {
-                stage = this.stages[index]
-                price += stage.price
-            }
-            return price;
-        }
+        min: 0
     },
     requirements : {
         type: String,
@@ -146,8 +138,13 @@ TripSchema.pre('validate', async function (next) {
     next();
 })
 
-TripSchema.pre('findOneAndUpdate', function (next) {
-    this.options.runValidators = true
+TripSchema.pre('save', function (next) {
+    var price = 0;
+    for (index in this.stages) {
+        stage = this.stages[index]
+        price += stage.price
+    }
+    this.price = price;
     next()
 })
 module.exports = mongoose.model('Trip', TripSchema);

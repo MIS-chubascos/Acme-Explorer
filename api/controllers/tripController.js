@@ -3,6 +3,8 @@
 var mongoose = require('mongoose'),
     Trip = mongoose.model('Trip');
 var Utils = require('../utils');
+var authController = require('./authController');
+var actorController = require('./actorController');
 
 // CRUD methods
 exports.getAllTrips = function (req, res) {
@@ -39,35 +41,112 @@ exports.getTripApplications = function (req, res) { // Logic will be implemented
     })
 }
 
-exports.createTrip = function (req, res) {
-    var newTrip = new Trip(req.body);
-    newTrip.save(function (err, trip) {
-        if (err) {
-            res.send(err);
+exports.createTrip = async function (req, res) {
+    var idToken = req.headers['idToken'];
+
+    if (!idToken) {
+        res.status(401);
+        res.json({message: 'Forbidden. Token must be provided.',error: err});
+    } else {
+        var authenticatedActorId = await authController.getUserId(idToken);
+        var authenticatedActor = await actorController.readAnActor(authenticatedActorId);
+
+        if (authenticatedActor.actorType.include('MANAGER') && authenticatedActor.banned == false) {
+            var newTrip = new Trip(req.body);
+            newTrip.save(function (err, trip) {
+                if (err) {
+                    res.send(err);
+                } else {
+                    res.json(trip)
+                }
+            })
         } else {
-            res.json(trip)
+            res.status(403);
+            res.json({message: 'Forbidden. More privileges are required.',error: err});
         }
-    })
+    }
 }
 
-exports.updateTrip = function (req, res) {
-    Trip.findOneAndUpdate({ _id: req.params.tripId }, req.body, { new: true, runValidators: true, context: 'query' }, function (err, trip) {
-        if (err) {
-            res.send(err);
+exports.updateTrip = async function (req, res) {
+    var idToken = req.headers['idToken'];
+
+    if (!idToken) {
+        res.status(401);
+        res.json({message: 'Forbidden. Token must be provided.',error: err});
+    } else {
+        var authenticatedActorId = await authController.getUserId(idToken);
+        var authenticatedActor = await actorController.readAnActor(authenticatedActorId);
+
+        if (authenticatedActor.actorType.include('MANAGER') && authenticatedActorId == req.body.manager 
+            && authenticatedActor.banned == false) {
+            Trip.findById(req.params.tripId, function (err, trip) {
+                if (err) {
+                    res.send(err);
+                } else if (trip.publicationDate <= new Date() ) {
+                    res.status(403);
+                    res.json({message: 'Forbidden. The trip is already published.', error: err});
+                } else {
+                    var updatedTrip = req.body;
+                    trip.title = updatedTrip.title;
+                    trip.description = updatedTrip.description;
+                    trip.requirements = updatedTrip.requirements;
+                    trip.pictures = updatedTrip.pictures;
+                    trip.stages = updatedTrip.stages;
+                    trip.startDate = updatedTrip.startDate;
+                    trip.endDate = updatedTrip.endDate;
+                    trip.publicationDate = updatedTrip.publicationDate;
+                    trip.cancelReason = updatedTrip.cancelReason;
+                    trip.save(function (error, newTrip) {
+                        if (error) {
+                            res.send(error);
+                        }
+                        else {
+                            res.json(newTrip);
+                        }
+                    });
+                    
+                }
+            })
         } else {
-            res.json(trip)
+            res.status(403);
+            res.json({message: 'Forbidden. More privileges are required.',error: err});
         }
-    })
+    }
 }
 
-exports.deleteTrip = function (req, res) {
-    Trip.findOneAndDelete({ _id: req.params.tripId }, function (err, trip) {
-        if (err) {
-            res.send(err);
+exports.deleteTrip = async function (req, res) {
+    var idToken = req.headers['idToken'];
+
+    if (!idToken) {
+        res.status(401);
+        res.json({message: 'Forbidden. Token must be provided.', error: err});
+    } else {
+        var authenticatedActorId = await authController.getUserId(idToken);
+        var authenticatedActor = await actorController.readAnActor(authenticatedActorId);
+
+        if (authenticatedActor.actorType.include('MANAGER') && authenticatedActorId == req.body.manager 
+            && authenticatedActor.banned == false) {
+            Trip.findById(req.params.tripId, function (err, trip) {
+                if (err) {
+                    res.send(err);
+                } else if (trip.publicationDate <= new Date() ) {
+                    res.status(403);
+                    res.json({message: 'Forbidden. The trip is already published.',error: err});
+                } else {
+                    Trip.findOneAndDelete({ _id: req.params.tripId }, function (err, trip) {
+                        if (err) {
+                            res.send(err);
+                        } else {
+                            res.json({ message: 'Trip successfully removed.' })
+                        }
+                    })
+                }
+            });
         } else {
-            res.json({ message: 'Trip successfully removed.' })
+            res.status(403);
+            res.json({message: 'Forbidden. More privileges are required.',error: err});
         }
-    })
+    }
 }
 
 
