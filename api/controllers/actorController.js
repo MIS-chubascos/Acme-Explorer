@@ -17,7 +17,7 @@ exports.listAllActors = function (req, res) {
     });
 };
 
-//Should be an admin
+
 exports.createAnActor = function (req, res) {
     var new_actor = new Actor(req.body);
     new_actor.save(function (error, actor) {
@@ -29,7 +29,7 @@ exports.createAnActor = function (req, res) {
         }
     });
 };
-//Should be an admin
+
 exports.readAnActor = function (req, res) {
     Actor.findById(req.params.actorId, function (err, actor) {
         if (err) {
@@ -119,7 +119,7 @@ exports.updateAnActorVerified = function(req,res){
     });
 }
 
-
+/*
 //Only admin can delete actors. Async function needed for authController method
 exports.deleteAnActor = async function (req, res) { 
     var idToken = req.headers['idtoken'];
@@ -138,7 +138,21 @@ exports.deleteAnActor = async function (req, res) {
         });
     };
 }
+*/
 
+// Checked admin on routes
+exports.deleteAnActor = async function (req, res) { 
+        Actor.remove({
+            _id: req.params.actorId
+        }, function (err, actor) {
+            if (err) {
+                res.send(err);
+            }
+            else {
+                res.json({ message: 'actor successfully deleted' });
+            }
+        });
+};
 
 
 

@@ -17,10 +17,13 @@ module.exports = function (app) {
 
     //v2 checking roles
     app.route('/v2/actors/:actorId')
+        .delete(authController.verifyUser(['ADMINISTRATOR']),actors.deleteAnActor)
         .put(authController.verifyUser(['ADMINISTRATOR',
                                         'MANAGER',
                                         'EXPLORER',
                                         'SPONSOR']),actors.updateAnActorVerified)
+        
+                                        
 
 
     app.route('/actors/:actorId/tripApplications')
