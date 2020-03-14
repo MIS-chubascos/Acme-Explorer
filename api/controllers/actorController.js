@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
     Actor = mongoose.model('Actors'),
     TripApplication = mongoose.model('TripApplications');;
 var authController = require('./authController')
+var admin = require('firebase-admin');
 
 exports.listAllActors = function (req, res) {
     Actor.find({}, function (err, actors) {
