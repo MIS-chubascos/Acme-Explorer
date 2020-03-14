@@ -15,20 +15,6 @@ exports.getAllTripApplications = function(req, res) {
     });
 };
 
-exports.getAcceptedTripApplications = function(req, res) {
-    //Check if the user is a manager and if not: res.status(403); "only managers can list accepted applications"
-    //Check if the trip is related to the manager and if not: res.status(403); "only the manager of the trip can list its applications"
-
-    TripApplication.find({trip: req.params.tripId, status: 'ACCEPTED'}, function(err, tripApplications) {
-        if (err) {
-            res.status(500).send(err);
-
-        } else {
-            res.send(tripApplications);
-        }
-    });
-};
-
 exports.getTripApplication = function(req, res) {
     //Check if the user is an explorer or a manager and if not: res.status(403); "only explorers and managers can display applications"
     //Check if the user is an explorer and the tripApplication is hers and if not: res.status(403); "explorers can only display the applications they created"
@@ -86,5 +72,16 @@ exports.deleteTripApplication = function(req, res) {
         } else {
             res.json({message: 'Trip aplication successfully deleted'})
         }
+    });
+};
+
+
+
+
+
+exports.getAcceptedTripApplications = function(tripId) {
+    
+    TripApplication.find({trip: tripId, status: 'ACCEPTED'}, function(err, tripApplications) {
+        return tripApplications;
     });
 };
