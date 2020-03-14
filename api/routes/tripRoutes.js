@@ -11,6 +11,9 @@ module.exports = function(app) {
         .put(trips.updateTrip)
         .delete(trips.deleteTrip);
 
+    app.route('/trips/:tripId/cancel')
+        .post(trips.cancelTrip)
+
     app.route('/trips/:tripId/tripApplications')
         .post(trips.createTripApplication);
 }
