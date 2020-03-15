@@ -5,6 +5,7 @@ var mongoose = require('mongoose'),
 var Utils = require('../utils');
 var authController = require('./authController');
 var actorController = require('./actorController');
+var tripApplicationController = require('./tripApplicationController');
 
 // CRUD methods
 exports.getAllTrips = function (req, res) {
@@ -209,7 +210,8 @@ exports.cancelTrip = async function (req, res) {
             Trip.findById(req.params.tripId, function (err, trip) {
                 if (err) {
                     res.send(err);
-                } else if (trip.startDate <= new Date()) { //TODO: Check accepted applications
+                } else if (trip.startDate <= new Date() 
+                    && tripApplicationController.getAcceptedTripApplications(req.params.tripId) <= 0) { 
                     res.json({message: 'Forbidden. The trip has started.',error: err});
                 } else {
                     Trip.findOneAndDelete({ _id: req.params.tripId }, function (err, trip) {
