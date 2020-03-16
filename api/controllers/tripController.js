@@ -120,13 +120,15 @@ exports.deleteTrip = async function (req, res) {
 }
 
 
-exports.createTripApplication = function (req, res) {
-    //Check if the user is an explorer and if not: res.status(403); "only explorers can create applications"
+exports.createTripApplication = async function (req, res) {
+
+    var idToken = req.headers['idToken'];
+    var authenticatedActorId = await authController.getUserId(idToken);
 
     var newTripApplication = new TripApplication();
     newTripApplication.comments = req.body.comments;
     newTripApplication.trip = req.params.tripId;
-    //newTripApplication.explorer = explorerId //Set explorer id
+    newTripApplication.explorer = authenticatedActorId;
 
     Trip.findById(req.params.tripId, function (err, trip) {
         if (err) {

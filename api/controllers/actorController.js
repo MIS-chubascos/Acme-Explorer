@@ -157,7 +157,6 @@ exports.deleteAnActor = async function (req, res) {
 
 
 exports.getTripApplicationsByActor = function(req, res) {
-    //Check if the user is an explorer and if not: res.status(403); "only explorers can list their applications"
     var query = {};
 
     if (req.query.explorer == "true") {

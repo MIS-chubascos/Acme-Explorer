@@ -18,6 +18,9 @@ module.exports = function(app) {
     app.route(V1_API_PATH + '/trips/:tripId/cancel')
         .post(trips.cancelTrip)
 
+    app.route(V1_API_PATH + '/trips/:tripId/tripApplications')
+        .post(trips.createTripApplication);
+
     // V2 methods
     app.route(V2_API_PATH + '/trips')
     .post(authController.verifyUser(['MANAGER']), trips.createTrip);
@@ -27,9 +30,9 @@ module.exports = function(app) {
         .delete(authController.verifyUser(['MANAGER']), trips.deleteTrip);
 
     app.route(V2_API_PATH + '/trips/:tripId/cancel')
-        .post(authController.verifyUser(['MANAGER']), trips.cancelTrip)
+        .post(authController.verifyUser(['MANAGER']), trips.cancelTrip);
 
-    // TODO: add version
-    app.route('/trips/:tripId/tripApplications')
-        .post(authController.verifyUser(['MANAGER']), trips.createTripApplication);
+    app.route(V2_API_PATH + '/trips/:tripId/tripApplications')
+        .post(authController.verifyUser(['EXPLORER']), trips.createTripApplication);
+        
 }
