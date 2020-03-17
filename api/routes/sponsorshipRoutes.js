@@ -1,28 +1,28 @@
 'use strict';
 
 module.exports = function (app) {
-    var sponsorship = require('../controllers/sponsorshipController'); 
+    var sponsorships = require('../controllers/sponsorshipController'); 
     var authController = require('../controllers/authController');
 
     const V1_API_PATH = '/api/v1';
     const V2_API_PATH = '/api/v2';
 
     // V1 methods
-
     app.route(V1_API_PATH + '/sponsorships')
-        .get(sponsorship.getAllSponsorships)
-        .post(sponsorship.createSponsorship)
+        .get(sponsorships.getAllSponsorships)
+        .post(sponsorships.createSponsorship)
 
     app.route(V1_API_PATH + '/sponsorships/:sponsorshipId')
-        .get(sponsorship.getSponsorship)
-        .put(sponsorship.updateSponsorship)
-        .delete(sponsorship.deleteSponsorship)
+        .get(sponsorships.getSponsorship)
+        .put(sponsorships.updateSponsorship)
+        .delete(sponsorships.deleteSponsorship)
     
     app.route(V1_API_PATH + '/trips/:tripId/sponsorships')
-        .get(sponsorship.getTripSponsorships)
+        .get(sponsorships.getTripSponsorships)
 
     app.route(V1_API_PATH + '/trips/:tripId/randomSponsorship')
-        .get(sponsorship.getTripRandomSponsorship)
+        .get(sponsorships.getTripRandomSponsorship)
+
 
     // V2 methods
 
@@ -33,4 +33,4 @@ module.exports = function (app) {
         .put(authController.verifyUser(['MANAGER','SPONSOR']), sponsorships.updateSponsorship)
         .delete(authController.verifyUser(['MANAGER','SPONSOR']), sponsorships.deleteSponsorship);
 
-  };     
+    };
