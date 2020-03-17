@@ -23,7 +23,7 @@ describe("Trip API Testing", () => {
     var trip = {"_id": "test_sponsorship", "sponsor":"123456", "url":"www.terra.es","banner":"123456","trip":"123456","payed":"True"}
     chai
       .request(app)
-      .post("/api/v1/trips")
+      .post("/api/v1/sponsorships")
       .send(trip)
       .end((err, res) => {
         expect(res).to.have.status(200);
@@ -33,7 +33,7 @@ describe("Trip API Testing", () => {
   });
 
   it("Update Sponsorship", (done) => {
-    var trip = {"url":"www.terra.es","banner":"123456","trip":"123456","payed":"True"}
+    var sponsorship = {"url":"www.terra.es","banner":"123456","trip":"123456","payed":"True"}
     chai
       .request(app)
       .put("/api/v1/sponsorships/test_trip")
