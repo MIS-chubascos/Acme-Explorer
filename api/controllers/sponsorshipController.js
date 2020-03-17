@@ -3,18 +3,21 @@
 var mongoose = require('mongoose'),
     Sponsorship = mongoose.model('Sponsorships');
 
+var authController = require('./authController');
+var actorController = require('./actorController');
 
-exports.createSponsorship = function(req,res){
+
+exports.createSponsorship = async function(req,res){
     var idToken = req.headers['idToken'];
 
     if (!idToken) {
         res.status(401);
         res.json({message: 'Forbidden. Token must be provided.',error: err});
     } else {
-        var authenticatedActorId =  authController.getUserId(idToken);
-        var authenticatedActor =  actorController.readAnActor(authenticatedActorId);
+        var authenticatedActorId = await authController.getUserId(idToken);
+        var authenticatedActor = await actorController.readAnActor(authenticatedActorId);
 
-        if (authenticatedActor.actorType.include('MANAGER') && authenticatedActor.banned == false) {
+        if (authenticatedActor.actorType.include('SPONSOR') && authenticatedActor.banned == false) {
             var newSponsorship = new Sponsorship(req.body);
             newSponsorship.save(function(err,sponsorship){
                 if(err){
@@ -30,7 +33,7 @@ exports.createSponsorship = function(req,res){
 
         } else {
             res.status(403);
-            res.json({message: 'Forbidden. More privileges are required.',error: err});
+            res.json({message: 'Forbidden. More privileges are required. ',error: err});
         }
     }
 }
@@ -55,17 +58,17 @@ exports.deleteSponsorship = function(req,res){
     });
 }
 
-exports.updateSponsorship = function(req,res){
+exports.updateSponsorship = async function(req,res){
     var idToken = req.headers['idtoken'];
 
     if (!idToken) {
         res.status(401);
         res.json({message: 'Forbidden. Token must be provided.',error: err});
     } else {
-        var authenticatedActorId =  authController.getUserId(idToken);
-        var authenticatedActor =  actorController.readAnActor(authenticatedActorId);
-        //MANAGER or SPONSOR?
-        if (authenticatedActor.actorType.include('MANAGER') && authenticatedActorId == req.body.manager 
+        var authenticatedActorId = await authController.getUserId(idToken);
+        var authenticatedActor = await actorController.readAnActor(authenticatedActorId);
+
+        if (authenticatedActor.actorType.include('SPONSOR') && authenticatedActorId == req.body.manager 
             && authenticatedActor.banned == false) {
             
                 Sponsorship.findOneAndUpdate({_id: req.params.sponsorshipId}, req.body, {new:true}, function(err,sponsorship){
@@ -103,7 +106,6 @@ exports.updateSponsorship = function(req,res){
 
     }
 }
-    
 
 
 exports.getAllSponsorships = function(req,res){
