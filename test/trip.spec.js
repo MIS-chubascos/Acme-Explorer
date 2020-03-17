@@ -19,7 +19,6 @@ describe("Trip API Testing", () => {
       });
   });
 
-
   it("Post Trip", done => {
     var trip = {"_id": "test_trip", "title":"Japan", "stages":[{"title":"Tokyo","price":1000,"order":0,"description":"Amazing trip for otakus"}],"endDate":"2020-03-18","startDate":"2020-03-13","description":"Amazing trip for otakus","requirements":"be careful with coronavirus","publicationDate":"2020-03-10","manager":"12345"}
     chai
@@ -33,17 +32,31 @@ describe("Trip API Testing", () => {
       });
   });
 
-  it("Update Trip", (done) => {
-    var trip = {"title":"Japan 2", "stages":[{"title":"Tokyo","price":3000,"order":0,"description":"Amazing trip for otakus"}],"endDate":"2020-03-18","startDate":"2020-03-13","description":"Amazing trip for otakus","requirements":"be careful with coronavirus","publicationDate":"2020-03-10","manager":"12345"}
+  it("Get Trip", done => {
     chai
       .request(app)
-      .put("/api/v1/trips/test_trip")
-      .send(trip)
+      .get("/api/v1/trips/test_trip")
       .end((err, res) => {
         expect(res).to.have.status(200);
+        expect('Content-Type', /json/);
         if (err) done(err);
         else done();
       });
   });
+
+  // it("Update Trip", (done) => {
+  //   var trip = {"title":"Japan 2", "stages":[{"title":"Tokyo","price":3000,"order":0,"description":"Amazing trip for otakus"}],"endDate":"2020-03-18","startDate":"2020-03-13","description":"Amazing trip for otakus","requirements":"be careful with coronavirus","publicationDate":"2020-03-10","manager":"12345"}
+  //   chai
+  //     .request(app)
+  //     .put("/api/v1/trips/test_trip")
+  //     .send(trip)
+  //     .end((err, res) => {
+  //       expect(res).to.have.status(200);
+  //       if (err) done(err);
+  //       else done();
+  //     });
+  // });
+// });
 });
+
 
