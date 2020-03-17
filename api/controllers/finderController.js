@@ -81,6 +81,6 @@ exports.createFinder = function(explorerId) {
     });
 };
 
-exports.deleteFinder = function(finderId) {
-    Finder.remove({_id: finderId}, function(err, finder) {});
+exports.deleteFinder = function(explorerId) {
+    Finder.remove({explorer: explorerId}, function(err, finder) {});
 };
