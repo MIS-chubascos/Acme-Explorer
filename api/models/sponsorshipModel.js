@@ -2,6 +2,7 @@
 
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+//Actor = mongoose.model('Actor');
 
 var SponsorshipSchema = new Schema({
 
