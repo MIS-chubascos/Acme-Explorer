@@ -23,7 +23,6 @@ module.exports = function (app) {
 
     app.route(V1_API_PATH + '/trips/:tripId/randomSponsorship')
         .get(sponsorship.getTripRandomSponsorship)
-};
 
     // V2 methods
 
@@ -34,4 +33,4 @@ module.exports = function (app) {
         .put(authController.verifyUser(['MANAGER','SPONSOR']), sponsorships.updateSponsorship)
         .delete(authController.verifyUser(['MANAGER','SPONSOR']), sponsorships.deleteSponsorship);
 
-        
+  };     
