@@ -2,7 +2,8 @@
 
 var mongoose = require('mongoose'),
     Actor = mongoose.model('Actors'),
-    TripApplication = mongoose.model('TripApplications');;
+    TripApplication = mongoose.model('TripApplications'),
+    Trip = mongoose.model('Trip');
 var authController = require('./authController')
 var admin = require('firebase-admin');
 
@@ -157,7 +158,6 @@ exports.deleteAnActor = async function (req, res) {
 
 
 exports.getTripApplicationsByActor = function(req, res) {
-    //Check if the user is an explorer and if not: res.status(403); "only explorers can list their applications"
     var query = {};
 
     if (req.query.explorer == "true") {
@@ -193,78 +193,95 @@ denote any of the last 1-36 months or Y01-Y03 to denote any of the last three ye
 /**According to the requirements, it can be introduced as M01-M36 or as Y01-Y03. 
  * We need to parse the string and upercase it for evading minor typing errors
  */
-function getPeriod(string){
-    try{ 
+function getPeriod(string) {
+    try { 
         var initDate = new Date(); //The first day of the period (setted below)
         var uppercased  = string.toUpperCase(); //Upercased input
-        var numbers = Number(uppercased.substring(1,3));  //Syntax for the form M01-M36
+        var numbers = Number(uppercased.substring(1,3)); //Syntax for the form M01-M36
         
-        //Now we have two posibilities Mxx or Yxx
-        //First months (M)
-        if(string.startsWith("M")){
-            if(numbers<1||numbers>36){ //Months can be 1 to 36
-                return{error: "Please insert a month between 1 and 36 both included"}; 
-            }else{ //
-                if(numbers<12){ //less than 1 year
-                    initDate.setMonth(initDate.getMonth()-numbers);
-                }else if(numbers>11 && numbers<24){ //1 year
-                    initDate.setFullYear((initDate.getFullYear-1), (initDate.getMonth()-(numbers-12)));
-                }else if(numbers>23 && numbers<37){ // 2 year
-                    initDate.setFullYear((initDate.getFullYear-2), (initDate.getMonth()-(numbers-24)));
-                }
+        // Now we have two posibilities: Mxx or Yxx
+        // First months (M)
+        if (string.startsWith("M")) {
+            if (numbers < 1 || numbers > 36) { // Months can be from 1 to 36
+                return {error: "Please insert a month between 1 and 36 both included"};
+
+            } else {
+                initDate.setMonth(initDate.getMonth - numbers);
             }
-        //now years (Y)
-        }else if(string.startsWith("Y")){
-            if(numbers<1||numbers>3){
-                return{error: "Please insert a year between 1 and 3 both included"};
-            }else{
-                initDate.setFullYear(initDate.getFullYear()-numbers)
+        
+        // now years (Y)
+        } else if (string.startsWith("Y")) {
+            if (numbers < 1 || numbers > 3) {
+                return {error: "Please insert a year between 1 and 3 both included"};
+
+            } else {
+                initDate.setFullYear(initDate.getFullYear() - numbers);
             }
-        }else{  //bad syntax
-            return{error:"Period must be as following: M01-M36 of Y01-Y03"}
-        } 
-        return{initDate: initDate}
-    } catch(error){ //Probably bad syntax
-    return{error:"Period must be as following: M01-M36 of Y01-Y03"}
+
+        } else { //bad syntax
+            return {error:"Period must be as following: M01-M36 of Y01-Y03"};
+        }
+
+        return {initDate: initDate};
+
+    } catch(error) { //Probably bad syntax
+        return {error:"Period must be as following: M01-M36 of Y01-Y03"};
     }
 }
 
-//Once we have processed the date we can perform the calculations
-exports.cubeDataMoney = function(req,res){
-    var endDate = new Date(); //Today, the last day of the period
-    var explorer = req.params.explorer; //We receive an explorer from a form
-    var periodPreProcesed = req.body.period;  //We receive the period input
-    var period = getPeriod(periodPreProcesed); //Process the period for obtaining two dates 
+// Once we have processed the date we can perform the calculations
+exports.cubeDataMoney = function(req,res) {
+    var explorer = req.params.explorer; // We receive an explorer from a form
+    var periodPreProcesed = req.params.period; // We receive the period input
+    var period = getPeriod(periodPreProcesed); //Process the period for obtaining two dates
 
-    if(period.error){
+    if (period.error) {
         res.status(400).send(period.error);
-    }else{
+
+    } else {
         var initialDay = period.initDate; //Date for making the period
     
         TripApplication.aggregate([
             {
-                $match: {   //filtering the trips of the explorer by his applications
-                    status:"ACCEPTED",
+                $match: { // filtering the trips of the explorer by his applications
+                    status: "ACCEPTED",
                     explorer: explorer,
-                    moment: {
-                        $gte: initialDay,
-                        $lte: endDate
+                    paidDate: {
+                        $gte: initialDay
                     }
                 }
-            }, {
+            },
+            {
                 $group: {  //we need the trips of the explorer for calculating the total ammount of money
-                    _id:"$explorer",
-                    trips: {$push:"$trip"},
-                    sumPrice: {$sum:"price"}
+                    _id: "$explorer",
+                    trips: {$push: "$trip"}
                 }
             }
-        ], function(err,results){
-            if(err){
+        ], function(err, tripApplications) {
+            if (err) {
                 res.send(err);
-            }else{
-                res.send(results); //if all is ok, return the data 
+            } else {
+                Trip.aggregate([
+                    {
+                        $match: {
+                            _id: {$in: tripApplications}
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            money: {$sum: "$price"}
+                        }
+                    }
+                ], function(err, results) {
+                    if (err) {
+                        res.send(err);
+                    } else {
+                        res.send(results); //if all is ok, return the data 
+                    }
+                });
             }
-        })
+        });
     }
 }
 
@@ -309,14 +326,14 @@ function translateMongoComparator(string){
 }
 
 //We will receive something like    get all M[p,e] > V    
-exports.cubeDataComparator=function(req,res){
-    var period = req.query.period; //period in query
-    var queryComparator = req.query.comparator; //first extract the comparator requested in string
+exports.cubeDataComparator = function(req, res) {
+    var period = req.params.period; //period in query
+    var queryComparator = req.params.comparator; //first extract the comparator requested in string
     var comparators = ['==','!=','>','>=','<','<=']; //preventing input errors
-    var ammount = req.query.ammount; //the ammount of money 'V' asked in query
+    var ammount = req.params.ammount; //the ammount of money 'V' asked in query
 
-    if(queryComparator.in(comparators)){ //preventing input errors
-        var queryAmmount={};
+    if (comparators.includes(queryComparator)) { //preventing input errors
+        var queryAmmount = {};
         var comp = translateMongoComparator(queryComparator); //we need to fill a mongo query so we need to translate
         queryAmmount[comp] = ammount; //This will build the money query we need in the form {comparator:ammount} {$gt:5}
         TripApplication.aggregate([  //It is easier to rebuild the query than making a dynamic method

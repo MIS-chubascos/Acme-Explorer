@@ -6,53 +6,31 @@ Finder = mongoose.model('Finders'),
 Config = mongoose.model('Config');
 var TripController = require('./tripController');
 
-exports.getAllFinders = function(req, res) {
-    Finder.find(function(err, finders) {
-        if (err) {
-            res.status(500).send(err);
+exports.getFinder = async function(req, res) {
+    var idToken = req.headers['idToken'];
+    var authenticatedActorId = await authController.getUserId(idToken);
 
-        } else {
-            res.json(finders);
-        }
-    });
-};
-
-exports.getFinder = function(req, res) {
-    //Check if the user is an explorer and if not: res.status(403); "only explorers can display finders"
-    //Check if the user is an explorer and the finder is hers and if not: res.status(403); "explorers can only display their own finder"
     Finder.findById(req.params.finderId, function(err, finder) {
         if (err) {
             res.status(500).send(err);
 
         } else {
-            res.json(finder);
-        }
-    });
-};
-
-exports.createFinder = function(req, res) {
-    var newFinder = new Finder();
-
-    newFinder.save(function(err, finder) {
-        if (err) {
-            if (err.name == 'ValidationError') {
-                res.status(422).send(err);
+            if (authenticatedActorId == finder.explorer) {
+                res.json(finder);
 
             } else {
-                res.status(500).send(err);
+                res.status(403).send({message: 'You can only display your own finder.'});
             }
-
-        } else {
-            res.json(finder);
         }
     });
 };
 
-exports.updateFinder = function(req, res) {
-    //Check if the user is an explorer and if not: res.status(403); "only explorers can display finders"
-    //Check if the user is an explorer and the finder is hers and if not: res.status(403); "explorers can only display their own finder"
+exports.updateFinder = async function(req, res) {
+    var idToken = req.headers['idToken'];
+    var authenticatedActorId = await authController.getUserId(idToken);
 
-    Finder.findOneAndUpdate({_id: req.params.finderId}, req.body, {new: true}, function(err, finder) {
+    if (authenticatedActorId == req.body.explorer) {
+        Finder.findOneAndUpdate({_id: req.params.finderId}, req.body, {new: true}, function(err, finder) {
             if (err) {
                 res.status(500).send(err);
 
@@ -60,38 +38,49 @@ exports.updateFinder = function(req, res) {
                 cache.del("tripsByFinder");
                 res.json(finder);
             }
-    });
+        });
+
+    } else {
+        res.status(403).send({message: 'You can only update your own finder.'});
+    }
 };
 
-exports.deleteFinder = function(req, res) {
-    Finder.remove({_id: req.params.finderId}, function(err, finder) {
-        if (err) {
-            res.status(500).send(err);
-
-        } else {
-            res.json({message: 'Finder successfully deleted'})
-        }
-    });
-};
-
-
-
-
-
-exports.getTripsByFinder = async function(req, res) { 
-    //Check if the user is an explorer and if not: res.status(403); "only explorers can use finders"
-    //Check if the user is an explorer and the finder is hers and if not: res.status(403); "explorers can only use their own finder"
+exports.getTripsByFinder = async function(req, res) {
+    var idToken = req.headers['idToken'];
+    var authenticatedActorId = await authController.getUserId(idToken);
 
     var config = await Config.findOne({}).exec();
     var finder = await Finder.findById(req.params.finderId).exec();
     var cachedResults = cache.get("tripsByFinder");
 
-    if (!cachedResults) {
-        var finderResults = await TripController.searchTrips(finder.keyword, finder.minPrice, finder.maxPrice, finder.startDate, finder.endDate);
-        cache.put("tripsByFinder", finderResults, config.finderCacheTime * 3600000);
-        res.json(finderResults.slice(0, config.finderMaxResults));
-        
+    if (authenticatedActorId == finder.explorer) {
+        if (!cachedResults) {
+            var finderResults = await TripController.searchTrips(finder.keyword, finder.minPrice, finder.maxPrice, finder.startDate, finder.endDate);
+            cache.put("tripsByFinder", finderResults, config.finderCacheTime * 3600000);
+            res.json(finderResults.slice(0, config.finderMaxResults));
+            
+        } else {
+            res.json(cachedResults.slice(0, config.finderMaxResults));
+        }
+    
     } else {
-        res.json(cachedResults.slice(0, config.finderMaxResults));
+        res.status(403).send({message: 'You can only make searchs with your own finder.'});
     }
+};
+
+
+
+
+
+exports.createFinder = function(explorerId) {
+    var newFinder = new Finder();
+    newFinder.explorer = explorerId;
+
+    newFinder.save(function(err, finder) {
+        return finder;
+    });
+};
+
+exports.deleteFinder = function(finderId) {
+    Finder.remove({_id: finderId}, function(err, finder) {});
 };
