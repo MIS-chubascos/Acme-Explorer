@@ -32,7 +32,7 @@ exports.getTrip = function (req, res) {
     })
 }
 
-exports.getTripApplications = function (req, res) { // Logic will be implemented in next deliverable
+exports.getTripApplications = function (req, res) {
     Trip.findById(req.params.tripId, function (err, trips) {
         if (err) {
             res.send(err);
