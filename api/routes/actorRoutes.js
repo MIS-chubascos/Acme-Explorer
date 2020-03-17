@@ -7,12 +7,12 @@ module.exports = function (app) {
     const V2_API_PATH = '/api/v2';
     
     // V1 methods
-    app.route('/v1/actors') //Not checking role
+    app.route(V1_API_PATH +'/actors') //Not checking role
         .get(actors.listAllActors)
         .post(actors.createAnActor)
     
 
-    app.route('/v1/actors/:actorId') //not checking roles
+    app.route(V1_API_PATH + '/actors/:actorId') //not checking roles
         .get(actors.readAnActor)
         .put(actors.updateAnActor)
         .delete(actors.deleteAnActor)
@@ -22,7 +22,7 @@ module.exports = function (app) {
 
 
     // V2 methods
-    app.route('/v2/actors/:actorId')
+    app.route(V2_API_PATH + '/actors/:actorId')
         .delete(authController.verifyUser(['ADMINISTRATOR']),actors.deleteAnActor)
         .put(authController.verifyUser(['ADMINISTRATOR',
                                         'MANAGER',
@@ -37,10 +37,10 @@ module.exports = function (app) {
 
 
     //given an explorer and a period, return the result of query. check 'sumPrice' atribute 
-    app.route('/actors/cubeDataMoney/:explorer/:period')
+    app.route(V1_API_PATH +'/actors/cubeDataMoney/:explorer/:period')
         .get(actors.cubeDataMoney)
 
     // get all M[p,e] > V    need ask period, ammount and comparator 
-    app.route('/actors/cubeDataComparator/:period/:ammount/:comparator')
+    app.route(V1_API_PATH +'/actors/cubeDataComparator/:period/:ammount/:comparator')
         .get(actors.cubeDataComparator)
     };
