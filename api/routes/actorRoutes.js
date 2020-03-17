@@ -6,13 +6,13 @@ module.exports = function (app) {
     const V1_API_PATH = '/api/v1';
     const V2_API_PATH = '/api/v2';
     
-    // V1 methods
-    app.route(V1_API_PATH +'/actors') //Not checking role
+    // V1 methods not checking roles
+    app.route(V1_API_PATH +'/actors') 
         .get(actors.listAllActors)
         .post(actors.createAnActor)
     
 
-    app.route(V1_API_PATH + '/actors/:actorId') //not checking roles
+    app.route(V1_API_PATH + '/actors/:actorId')
         .get(actors.readAnActor)
         .put(actors.updateAnActor)
         .delete(actors.deleteAnActor)
@@ -21,8 +21,9 @@ module.exports = function (app) {
         .get(actors.getTripApplicationsByActor);
 
 
-    // V2 methods
+    // V2 methods cheching roles (middleware or in the method indeed)
     app.route(V2_API_PATH + '/actors/:actorId')
+        .post(actors.createAnActorVerified)
         .delete(authController.verifyUser(['ADMINISTRATOR']),actors.deleteAnActor)
         .put(authController.verifyUser(['ADMINISTRATOR',
                                         'MANAGER',

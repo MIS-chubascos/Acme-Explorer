@@ -6,6 +6,7 @@ var mongoose = require('mongoose'),
     Trip = mongoose.model('Trip');
 var authController = require('./authController')
 var admin = require('firebase-admin');
+var finderController = require('./finderController');
 
 exports.listAllActors = function (req, res) {
     Actor.find({}, function (err, actors) {
@@ -20,8 +21,8 @@ exports.listAllActors = function (req, res) {
 
 
 exports.createAnActor = function (req, res) {
-    var new_actor = new Actor(req.body);
-    new_actor.save(function (error, actor) {
+    var newActor = new Actor(req.body);
+    newActor.save(function (error, actor) {
         if (error) {
             res.send(error);
         }
@@ -30,6 +31,62 @@ exports.createAnActor = function (req, res) {
         }
     });
 };
+
+//Only adm can create manager actors
+exports.createAnActorVerified = async function(req, res){
+    var newActor = new Actor(req.body);
+
+    if(newActor.actorType.includes('MANAGER')){
+        var idToken = req.headers['idtoken'];
+        if(idToken === null || idToken === 0){
+            res.status(403).send('Only administrators can create managers. Log in');
+        }
+        else{
+            var authUser = await authController.getUserId(idToken);
+            Actor.findById(authUser, function(err, actorLoged){
+                if(err){
+                    res.send(err);
+                }
+                else{
+                    if(actorLoged.actorType.includes('ADMINISTRATOR')){
+                        newActor.save(function(err,saveActor){
+                            if(err){
+                                res.send(err);
+                            }
+                            else{
+                                res.json(saveActor);
+                            } 
+                        });
+                    }
+                    else{
+                        res.status(403).send('Only administrators can create managers')
+                    }
+                }
+            });
+        }
+    }
+    else if(newActor.actorType.includes(['EXPLORER'])){
+        finderController.createFinder(newActor.actorId);
+        newActor.save(function(err, saveActor){
+            if(err){
+                res.send(err);
+            }
+            else{
+                res.json(saveActor);
+            }
+        })
+    }
+    else{
+        newActor.save(function(err, saveActor){
+            if(err){
+                res.send(err);
+            }
+            else{
+                res.json(saveActor);
+            }
+        })
+    }
+}
 
 exports.readAnActor = function (req, res) {
     Actor.findById(req.params.actorId, function (err, actor) {
@@ -143,7 +200,16 @@ exports.deleteAnActor = async function (req, res) {
 
 // Checked admin on routes
 exports.deleteAnActor = async function (req, res) { 
-        Actor.remove({
+    var actorForErase = Actor.findById(req.params.actorId);
+    if(actorForErase != null){
+        if(actorForErase.actorType.includes('EXPLORER')){
+            finderController.deleteFinder(actorForErase.actorId)
+        }
+        else{
+            break;
+        }
+    }
+    Actor.remove({
             _id: req.params.actorId
         }, function (err, actor) {
             if (err) {
