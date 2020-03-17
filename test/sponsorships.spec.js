@@ -1,4 +1,4 @@
-const app = require("../app");
+/*const app = require("../app");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 var mongoose = require('mongoose'),
@@ -7,6 +7,7 @@ var mongoose = require('mongoose'),
 const { expect } = chai;
 chai.use(chaiHttp);
 describe("Trip API Testing", () => {
+  
   it("Get Sponsorships", done => {
     chai
       .request(app)
@@ -17,9 +18,9 @@ describe("Trip API Testing", () => {
         if (err) done(err);
         else done();
       });
-  });
+  });*/
 //sponsor, trip y banner?
- it("Post Sponsorship", done => {
+ /*it("Post Sponsorship", done => {
     var trip = {"_id": "test_sponsorship", "sponsor":"123456", "url":"www.terra.es","banner":"123456","trip":"123456","payed":"True"}
     chai
       .request(app)
@@ -43,5 +44,5 @@ describe("Trip API Testing", () => {
         if (err) done(err);
         else done();
       });
-  });
-});
+  });*/
+//});
