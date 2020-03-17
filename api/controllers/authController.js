@@ -34,12 +34,10 @@ exports.verifyUser = function(requiredRoles) {
       console.log('idToken: '+idToken);
   
       admin.auth().verifyIdToken(idToken).then(function(decodedToken) {
-          console.log('entra en el then de verifyIdToken: ');
-  
           var uid = decodedToken.uid;
           var auth_time = decodedToken.auth_time;
           var exp =  decodedToken.exp;
-          console.log('idToken verificado para el uid: '+uid);
+          console.log('idToken verified for uid: '+uid);
           console.log('auth_time: '+auth_time);
           console.log('exp: '+exp);
   
@@ -64,8 +62,14 @@ exports.verifyUser = function(requiredRoles) {
                      }
                   }
                 }
-              if (isAuth) return callback(null, actor);
-              else {
+              if (isAuth) {
+                if (!actor.banned) {
+                  return callback(null, actor);
+                } else {
+                  res.status(403);
+                  res.json({message: 'The actor is banned',error: err});
+                }
+              } else {
                 res.status(403); //an access token is valid, but requires more privileges
                 res.json({message: 'The actor has not the required roles',error: err});
                 }
