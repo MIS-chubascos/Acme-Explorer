@@ -122,13 +122,13 @@ exports.populate = function (req, res) {
             returnDate: true
         })
 
-        var trip = dummies['trips'][Math.floor(Math.random() * req.query.size)];
+        var trip = dummies['trips'][Math.floor(Math.random() * req.query.size) % dummies['trips'].length];
 
         dummyTripApplication._id = new mongoose.Types.ObjectId();
         dummyTripApplication.status = 'PENDING';
         dummyTripApplication.trip = trip['_id'];
         dummyTripApplication.manager = trip['manager'];
-        dummyTripApplication.explorer = dummies['explorers'][Math.floor(Math.random() * req.query.size)];
+        dummyTripApplication.explorer = dummies['explorers'][Math.floor(Math.random() * req.query.size)]['_id'];
         dummies['tripApplications'].push(dummyTripApplication)
     }
 
@@ -156,7 +156,7 @@ exports.populate = function (req, res) {
 
         dummySponsorship._id = new mongoose.Types.ObjectId();
         dummySponsorship.sponsor = dummies['sponsors'][Math.floor(Math.random() * req.query.size)]['_id'];
-        dummySponsorship.trip = dummies['trips'][Math.floor(Math.random() * req.query.size)]['_id'];
+        dummySponsorship.trip = dummies['trips'][Math.floor(Math.random() * req.query.size) % dummies['trips'].length]['_id'];
         dummySponsorship.__v = 0;
         dummies['sponsorships'].push(dummySponsorship)
     }
