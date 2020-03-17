@@ -54,10 +54,10 @@ var SponsorshipSchema = new Schema({
       SponsorshipSchema.pre('save', async function (callback){
         const sponsor = await Actor.findById({_id: this.sponsor}); 
         if (sponsor.flat_rate) {
-          console.log("Flat rate is true. Then sponsorship is payed");
+          console.log("Flat rate is true. The sponsorship payed");
           this.payed = true;
         }else{
-          console.log("Flat rate is false. Then sponsorship is not payed");
+          console.log("Flat rate is false. The sponsorship didn't pay");
         }
         console.log(this.payed);
         callback();
