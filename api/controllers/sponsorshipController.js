@@ -11,8 +11,8 @@ exports.createSponsorship = function(req,res){
         res.status(401);
         res.json({message: 'Forbidden. Token must be provided.',error: err});
     } else {
-        var authenticatedActorId = await authController.getUserId(idToken);
-        var authenticatedActor = await actorController.readAnActor(authenticatedActorId);
+        var authenticatedActorId =  authController.getUserId(idToken);
+        var authenticatedActor =  actorController.readAnActor(authenticatedActorId);
 
         if (authenticatedActor.actorType.include('MANAGER') && authenticatedActor.banned == false) {
             var newSponsorship = new Sponsorship(req.body);
@@ -62,8 +62,8 @@ exports.updateSponsorship = function(req,res){
         res.status(401);
         res.json({message: 'Forbidden. Token must be provided.',error: err});
     } else {
-        var authenticatedActorId = await authController.getUserId(idToken);
-        var authenticatedActor = await actorController.readAnActor(authenticatedActorId);
+        var authenticatedActorId =  authController.getUserId(idToken);
+        var authenticatedActor =  actorController.readAnActor(authenticatedActorId);
         //MANAGER or SPONSOR?
         if (authenticatedActor.actorType.include('MANAGER') && authenticatedActorId == req.body.manager 
             && authenticatedActor.banned == false) {
