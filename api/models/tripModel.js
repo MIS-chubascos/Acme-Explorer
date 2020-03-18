@@ -62,7 +62,7 @@ var TripSchema = new Schema({
     }],
     price : {
         type: Number,
-        required: 'Kindly enter the password of the trip',
+        required: 'Kindly enter the price of the trip',
         min: 0
     },
     requirements : {
@@ -120,7 +120,7 @@ var TripSchema = new Schema({
         type: Date,
         default: Date.now
     }
-}, {strict: false})
+}, {strict: false, collection: 'trips'})
 
 TripSchema.index({ ticker: 'text', title: 'text', description: 'text' });
 TripSchema.index({ price: 1, startDate: 1, endDate:1 });
