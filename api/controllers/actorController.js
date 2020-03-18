@@ -198,8 +198,19 @@ exports.deleteAnActor = async function (req, res) {
 }
 */
 
+exports.deleteAnActorV1 = function(req,res){
+    Actor.remove({_id: req.params.actorId}, function(err,actor){
+        if(err){
+            res.send(err);
+        }
+        else{
+            res.json({ message: 'actor successfully deleted' });
+        }
+    })
+}
+
 // Checked admin on routes
-exports.deleteAnActor = async function (req, res) { 
+exports.deleteAnActorV2 = async function (req, res) { 
     var actorForErase = Actor.findById(req.params.actorId);
     if(actorForErase != null){
         if(actorForErase.actorType.includes('EXPLORER')){

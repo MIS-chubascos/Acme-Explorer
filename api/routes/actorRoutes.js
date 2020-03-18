@@ -15,7 +15,7 @@ module.exports = function (app) {
     app.route(V1_API_PATH + '/actors/:actorId')
         .get(actors.readAnActor)
         .put(actors.updateAnActor)
-        .delete(actors.deleteAnActor)
+        .delete(actors.deleteAnActorV1)
 
     app.route(V1_API_PATH + '/actors/:actorId/tripApplications')
         .get(actors.getTripApplicationsByActorV1);
@@ -24,7 +24,7 @@ module.exports = function (app) {
     // V2 methods cheching roles (middleware or in the method indeed)
     app.route(V2_API_PATH + '/actors/:actorId')
         .post(actors.createAnActorVerified)
-        .delete(authController.verifyUser(['ADMINISTRATOR']),actors.deleteAnActor)
+        .delete(authController.verifyUser(['ADMINISTRATOR']),actors.deleteAnActorV2)
         .put(authController.verifyUser(['ADMINISTRATOR',
                                         'MANAGER',
                                         'EXPLORER',
