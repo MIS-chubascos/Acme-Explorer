@@ -8,18 +8,18 @@ module.exports = function(app) {
 
     // V1 methods
     app.route(V1_API_PATH + '/finders/:finderId')
-        .get(finders.getFinder)
-        .put(finders.updateFinder);
+        .get(finders.getFinderV1)
+        .put(finders.updateFinderV1);
 
     app.route(V1_API_PATH + '/finders/:finderId/trips')
-        .get(finders.getTripsByFinder);
+        .get(finders.getTripsByFinderV1);
 
     // V2 methods
     app.route(V2_API_PATH + '/finders/:finderId')
-        .get(authController.verifyUser(['EXPLORER']), finders.getFinder)
-        .put(authController.verifyUser(['EXPLORER']), finders.updateFinder);
+        .get(authController.verifyUser(['EXPLORER']), finders.getFinderV2)
+        .put(authController.verifyUser(['EXPLORER']), finders.updateFinderV2);
 
     app.route(V2_API_PATH + '/finders/:finderId/trips')
-        .get(authController.verifyUser(['EXPLORER']), finders.getTripsByFinder);
+        .get(authController.verifyUser(['EXPLORER']), finders.getTripsByFinderV2);
     
 }

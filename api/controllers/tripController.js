@@ -179,6 +179,9 @@ exports.createTripApplicationV1 = function (req, res) {
     Trip.findById(req.params.tripId, function (err, trip) {
         if (err) {
             res.status(500).send(err);
+        
+        } else if (!trip) {
+            res.status(404).send({message: "No trip found for the given ID"});
 
         } else {
             var now = new Date();
@@ -224,6 +227,9 @@ exports.createTripApplicationV2 = async function (req, res) {
     Trip.findById(req.params.tripId, function (err, trip) {
         if (err) {
             res.status(500).send(err);
+
+        } else if (!trip) {
+            res.status(404).send({message: "No trip found for the given ID"});
 
         } else {
             var now = new Date();
@@ -309,9 +315,8 @@ exports.cancelTripV2 = async function (req, res) {
     }
 }
 
-exports.searchTrips = function (keyword, minPrice, maxPrice, startDate, endDate) {
+exports.searchTrips = async function (keyword, minPrice, maxPrice, startDate, endDate) {
     var query = Utils.computeTripsQuery(keyword, minPrice, maxPrice, startDate, endDate);
-    Trip.find(query, function (err, trips) {
-        return trips;
-    })
+    var resultTrips = await Trip.find(query).exec();
+    return resultTrips;
 }

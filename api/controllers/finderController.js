@@ -4,15 +4,33 @@ var mongoose = require('mongoose'),
 cache = require('memory-cache'),
 Finder = mongoose.model('Finders'),
 Config = mongoose.model('Config');
-var TripController = require('./tripController');
+var tripController = require('./tripController');
+var authController = require('./authController');
 
-exports.getFinder = async function(req, res) {
+exports.getFinderV1 = function(req, res) {
+    Finder.findById(req.params.finderId, function(err, finder) {
+        if (err) {
+            res.status(500).send(err);
+        
+        } else if (!finder) {
+            res.status(404).send({message: "No finder found for the given ID"});
+
+        } else {
+            res.json(finder);
+        }
+    });
+};
+
+exports.getFinderV2 = async function(req, res) {
     var idToken = req.headers['idToken'];
     var authenticatedActorId = await authController.getUserId(idToken);
 
     Finder.findById(req.params.finderId, function(err, finder) {
         if (err) {
             res.status(500).send(err);
+
+        } else if (!finder) {
+            res.status(404).send({message: "No finder found for the given ID"});
 
         } else {
             if (authenticatedActorId == finder.explorer) {
@@ -25,7 +43,22 @@ exports.getFinder = async function(req, res) {
     });
 };
 
-exports.updateFinder = async function(req, res) {
+exports.updateFinderV1 = function(req, res) {
+    Finder.findOneAndUpdate({_id: req.params.finderId}, req.body, {new: true}, function(err, finder) {
+        if (err) {
+            res.status(500).send(err);
+        
+        } else if (!finder) {
+            res.status(404).send({message: "No finder found for the given ID"});
+
+        } else {
+            cache.del("tripsByFinder");
+            res.json(finder);
+        }
+    });
+};
+
+exports.updateFinderV2 = async function(req, res) {
     var idToken = req.headers['idToken'];
     var authenticatedActorId = await authController.getUserId(idToken);
 
@@ -33,6 +66,9 @@ exports.updateFinder = async function(req, res) {
         Finder.findOneAndUpdate({_id: req.params.finderId}, req.body, {new: true}, function(err, finder) {
             if (err) {
                 res.status(500).send(err);
+
+            } else if (!finder) {
+                res.status(404).send({message: "No finder found for the given ID"});
 
             } else {
                 cache.del("tripsByFinder");
@@ -45,7 +81,25 @@ exports.updateFinder = async function(req, res) {
     }
 };
 
-exports.getTripsByFinder = async function(req, res) {
+exports.getTripsByFinderV1 = async function(req, res) {
+    var config = await Config.findOne({}).exec();
+    var finder = await Finder.findById(req.params.finderId).exec();
+    var cachedResults = cache.get("tripsByFinder");
+
+    if (!finder) {
+        res.status(404).send({message: "No finder found for the given ID"});
+
+    } else if (!cachedResults) {
+        var finderResults = await tripController.searchTrips(finder.keyword, finder.minPrice, finder.maxPrice, finder.startDate, finder.endDate);
+        cache.put("tripsByFinder", finderResults, config.finderCacheTime * 3600000);
+        res.json(finderResults.slice(0, config.finderMaxResults));
+        
+    } else {
+        res.json(cachedResults.slice(0, config.finderMaxResults));
+    }
+};
+
+exports.getTripsByFinderV2 = async function(req, res) {
     var idToken = req.headers['idToken'];
     var authenticatedActorId = await authController.getUserId(idToken);
 
@@ -53,9 +107,12 @@ exports.getTripsByFinder = async function(req, res) {
     var finder = await Finder.findById(req.params.finderId).exec();
     var cachedResults = cache.get("tripsByFinder");
 
-    if (authenticatedActorId == finder.explorer) {
+    if (!finder) {
+        res.status(404).send({message: "No finder found for the given ID"});
+
+    } else if (authenticatedActorId == finder.explorer) {
         if (!cachedResults) {
-            var finderResults = await TripController.searchTrips(finder.keyword, finder.minPrice, finder.maxPrice, finder.startDate, finder.endDate);
+            var finderResults = await tripController.searchTrips(finder.keyword, finder.minPrice, finder.maxPrice, finder.startDate, finder.endDate);
             cache.put("tripsByFinder", finderResults, config.finderCacheTime * 3600000);
             res.json(finderResults.slice(0, config.finderMaxResults));
             
