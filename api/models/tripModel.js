@@ -62,7 +62,6 @@ var TripSchema = new Schema({
     }],
     price : {
         type: Number,
-        required: 'Kindly enter the price of the trip',
         min: 0
     },
     requirements : {
