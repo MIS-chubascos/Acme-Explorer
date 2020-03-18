@@ -1,0 +1,225 @@
+{
+	"info": {
+		"_postman_id": "aac86969-9ba9-4e0b-8888-b0785860b5c3",
+		"name": "ACME-Explorer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET /config",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8080/config",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"config"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT /config",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"finderMaxResults\": 11,\r\n    \"finderCacheTime\": 2,\r\n    \"flatRate\": 3,\r\n    \"finderMaxResult\": 6\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8080/config/5e5e669e06006405903e4040",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"config",
+						"5e5e669e06006405903e4040"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /actors",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8080/v1/actors",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"actors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST /actors",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"John\",\n\t\"surname\": \"Doe\",\n\t\"email\": \"john@mail.com\",\n\t\"phoneNumber\": \"911112911\",\n\t\"address\": \"here\",\n\t\"password\": \"passw0rd\",\n\t\"banned\": false,\n\t\"actorType\": [\"ADMINISTRATOR\",\"EXPLORER\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8080/v1/actors",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"actors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /actors/:actorId",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8080/v1/actors/5e5e669e06006405903e403d",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"actors",
+						"5e5e669e06006405903e403d"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT /actors/:actorId",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"John\",\n\t\"surname\": \"Doe\",\n\t\"email\": \"john@mail.com\",\n\t\"phoneNumber\": \"911112911\",\n\t\"address\": \"here\",\n\t\"password\": \"passw0rd\",\n\t\"banned\": false,\n\t\"actorType\": [\"ADMINISTRATOR\",\"EXPLORER\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8080/v1/actors/5e5e669e06006405903e4038",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"actors",
+						"5e5e669e06006405903e4038"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /actors/:actorId",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8080/actors/5e5e669e06006405903e403a",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"actors",
+						"5e5e669e06006405903e403a"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/populate",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8080/populate?size=1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"populate"
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "1"
+						}
+					]
+				},
+				"description": "Whit this you can populate the database"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
