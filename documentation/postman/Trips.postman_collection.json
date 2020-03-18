@@ -1,0 +1,161 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Trips",
+		"_postman_id": "7660bda9-8176-e25a-6cce-136eab4aa392",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get all published and not cancelled trips",
+			"request": {
+				"url": "http://localhost:8080/api/v1/trips",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "idToken",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTU4NDI5NzkxMiwiZXhwIjoxNTg0MzAxNTEyLCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay13bjRsbEBhY21lLWV4cGxvcmVyLWRjOTg3LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwic3ViIjoiZmlyZWJhc2UtYWRtaW5zZGstd240bGxAYWNtZS1leHBsb3Jlci1kYzk4Ny5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInVpZCI6ImNhbWlsYXJleXllc0BnbWFpbC5jb20ifQ.VqHQkfyjf_mmy8GDLpeBxZbeV9u8o50k1vIEC4pZgJFKVLs5IMs5e5ZBjV7D8JmuX7VTf6Z2tbO0g_92jTyXLhf3sbrKowXDBwLNk1Fby-H1HmnKlVcb_ePnzLHL6wmhNGyjVuJw5lHG-PqrHOzaoy6Aowehp_v3ZSNL6PN3qEkO6ashLoIlF9W87GBzpKt2R7tObMwKlOwJA-LB7aqWQOyDplu-89BB09lyAHcKjybSgKJm0RcDwu6RDW0G6aMbagBcLyQo25jqMkAPw7WHJduVzyYcyciqK134ldWeAL3utiTAvjx96lB9qbJJzAVmG_jakK3CVBGBHeBa9veEvg",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"title\": \"Mystic Falls\", \n\t\"stages\":[\n\t\t{\n\t\t\t\"title\": \"The Church\",\n\t\t\t\"description\": \"So beautiful...\",\n\t\t\t\"price\": 100,\n\t\t\t\"order\": 0\n\t\t}],\n\t\"endDate\":\"2025-03-18\",\n\t\"startDate\":\"2025-03-13\",\n\t\"description\":\"Amazing trip for lovers of Vampire Diaries\",\n\t\"requirements\":\"Watch out! Vampires around...\",\n\t\"publicationDate\":\"2025-03-10\",\n\t\"manager\":\"5099803df3f4948bd2f98391\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new trip",
+			"request": {
+				"url": "http://localhost:8080/api/v1/trips",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "idToken",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTU4NDI5NzkxMiwiZXhwIjoxNTg0MzAxNTEyLCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay13bjRsbEBhY21lLWV4cGxvcmVyLWRjOTg3LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwic3ViIjoiZmlyZWJhc2UtYWRtaW5zZGstd240bGxAYWNtZS1leHBsb3Jlci1kYzk4Ny5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInVpZCI6ImNhbWlsYXJleXllc0BnbWFpbC5jb20ifQ.VqHQkfyjf_mmy8GDLpeBxZbeV9u8o50k1vIEC4pZgJFKVLs5IMs5e5ZBjV7D8JmuX7VTf6Z2tbO0g_92jTyXLhf3sbrKowXDBwLNk1Fby-H1HmnKlVcb_ePnzLHL6wmhNGyjVuJw5lHG-PqrHOzaoy6Aowehp_v3ZSNL6PN3qEkO6ashLoIlF9W87GBzpKt2R7tObMwKlOwJA-LB7aqWQOyDplu-89BB09lyAHcKjybSgKJm0RcDwu6RDW0G6aMbagBcLyQo25jqMkAPw7WHJduVzyYcyciqK134ldWeAL3utiTAvjx96lB9qbJJzAVmG_jakK3CVBGBHeBa9veEvg",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"title\": \"Mystic Falls\", \n\t\"stages\":[\n\t\t{\n\t\t\t\"title\": \"The Church\",\n\t\t\t\"description\": \"So beautiful...\",\n\t\t\t\"price\": 100,\n\t\t\t\"order\": 0\n\t\t}],\n\t\"endDate\":\"2025-03-18\",\n\t\"startDate\":\"2025-03-13\",\n\t\"description\":\"Amazing trip for lovers of Vampire Diaries\",\n\t\"requirements\":\"Watch out! Vampires around...\",\n\t\"publicationDate\":\"2025-03-10\",\n\t\"manager\":\"5099803df3f4948bd2f98391\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get trip by id",
+			"request": {
+				"url": "http://localhost:8080/api/v1/trips/5e729b808f09ad0dec23c464",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "idToken",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTU4NDI5NzkxMiwiZXhwIjoxNTg0MzAxNTEyLCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay13bjRsbEBhY21lLWV4cGxvcmVyLWRjOTg3LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwic3ViIjoiZmlyZWJhc2UtYWRtaW5zZGstd240bGxAYWNtZS1leHBsb3Jlci1kYzk4Ny5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInVpZCI6ImNhbWlsYXJleXllc0BnbWFpbC5jb20ifQ.VqHQkfyjf_mmy8GDLpeBxZbeV9u8o50k1vIEC4pZgJFKVLs5IMs5e5ZBjV7D8JmuX7VTf6Z2tbO0g_92jTyXLhf3sbrKowXDBwLNk1Fby-H1HmnKlVcb_ePnzLHL6wmhNGyjVuJw5lHG-PqrHOzaoy6Aowehp_v3ZSNL6PN3qEkO6ashLoIlF9W87GBzpKt2R7tObMwKlOwJA-LB7aqWQOyDplu-89BB09lyAHcKjybSgKJm0RcDwu6RDW0G6aMbagBcLyQo25jqMkAPw7WHJduVzyYcyciqK134ldWeAL3utiTAvjx96lB9qbJJzAVmG_jakK3CVBGBHeBa9veEvg",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"title\": \"Mystic Falls\", \n\t\"stages\":[\n\t\t{\n\t\t\t\"title\": \"The Church\",\n\t\t\t\"description\": \"So beautiful...\",\n\t\t\t\"price\": 100,\n\t\t\t\"order\": 0\n\t\t}],\n\t\"endDate\":\"2025-03-18\",\n\t\"startDate\":\"2025-03-13\",\n\t\"description\":\"Amazing trip for lovers of Vampire Diaries\",\n\t\"requirements\":\"Watch out! Vampires around...\",\n\t\"publicationDate\":\"2025-03-10\",\n\t\"manager\":\"5099803df3f4948bd2f98391\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Update a trip",
+			"request": {
+				"url": "http://localhost:8080/api/v1/trips/5e729b808f09ad0dec23c464",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "idToken",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTU4NDI5NzkxMiwiZXhwIjoxNTg0MzAxNTEyLCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay13bjRsbEBhY21lLWV4cGxvcmVyLWRjOTg3LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwic3ViIjoiZmlyZWJhc2UtYWRtaW5zZGstd240bGxAYWNtZS1leHBsb3Jlci1kYzk4Ny5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInVpZCI6ImNhbWlsYXJleXllc0BnbWFpbC5jb20ifQ.VqHQkfyjf_mmy8GDLpeBxZbeV9u8o50k1vIEC4pZgJFKVLs5IMs5e5ZBjV7D8JmuX7VTf6Z2tbO0g_92jTyXLhf3sbrKowXDBwLNk1Fby-H1HmnKlVcb_ePnzLHL6wmhNGyjVuJw5lHG-PqrHOzaoy6Aowehp_v3ZSNL6PN3qEkO6ashLoIlF9W87GBzpKt2R7tObMwKlOwJA-LB7aqWQOyDplu-89BB09lyAHcKjybSgKJm0RcDwu6RDW0G6aMbagBcLyQo25jqMkAPw7WHJduVzyYcyciqK134ldWeAL3utiTAvjx96lB9qbJJzAVmG_jakK3CVBGBHeBa9veEvg",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"title\": \"Mystic Falls\", \n\t\"stages\":[\n\t\t{\n\t\t\t\"title\": \"Salvatore School\",\n\t\t\t\"description\": \"For the young and talented\",\n\t\t\t\"price\": 100,\n\t\t\t\"order\": 0\n\t\t}],\n\t\"endDate\":\"2025-03-18\",\n\t\"startDate\":\"2025-03-13\",\n\t\"description\":\"Amazing trip for lovers of Vampire Diaries\",\n\t\"requirements\":\"Watch out! Vampires around...\",\n\t\"publicationDate\":\"2025-03-10\",\n\t\"manager\":\"5099803df3f4948bd2f98391\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel a trip",
+			"request": {
+				"url": "http://localhost:8080/api/v1/trips/5e729b808f09ad0dec23c464/cancel",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "idToken",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTU4NDI5NzkxMiwiZXhwIjoxNTg0MzAxNTEyLCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay13bjRsbEBhY21lLWV4cGxvcmVyLWRjOTg3LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwic3ViIjoiZmlyZWJhc2UtYWRtaW5zZGstd240bGxAYWNtZS1leHBsb3Jlci1kYzk4Ny5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInVpZCI6ImNhbWlsYXJleXllc0BnbWFpbC5jb20ifQ.VqHQkfyjf_mmy8GDLpeBxZbeV9u8o50k1vIEC4pZgJFKVLs5IMs5e5ZBjV7D8JmuX7VTf6Z2tbO0g_92jTyXLhf3sbrKowXDBwLNk1Fby-H1HmnKlVcb_ePnzLHL6wmhNGyjVuJw5lHG-PqrHOzaoy6Aowehp_v3ZSNL6PN3qEkO6ashLoIlF9W87GBzpKt2R7tObMwKlOwJA-LB7aqWQOyDplu-89BB09lyAHcKjybSgKJm0RcDwu6RDW0G6aMbagBcLyQo25jqMkAPw7WHJduVzyYcyciqK134ldWeAL3utiTAvjx96lB9qbJJzAVmG_jakK3CVBGBHeBa9veEvg",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"cancelReason\":\"Gas leakage...\",\n\t\"manager\":\"5099803df3f4948bd2f98391\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get manager's trips",
+			"request": {
+				"url": "http://localhost:8080/api/v1/actors/5099803df3f4948bd2f98391/trips",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "idToken",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTU4NDI5NzkxMiwiZXhwIjoxNTg0MzAxNTEyLCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay13bjRsbEBhY21lLWV4cGxvcmVyLWRjOTg3LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwic3ViIjoiZmlyZWJhc2UtYWRtaW5zZGstd240bGxAYWNtZS1leHBsb3Jlci1kYzk4Ny5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInVpZCI6ImNhbWlsYXJleXllc0BnbWFpbC5jb20ifQ.VqHQkfyjf_mmy8GDLpeBxZbeV9u8o50k1vIEC4pZgJFKVLs5IMs5e5ZBjV7D8JmuX7VTf6Z2tbO0g_92jTyXLhf3sbrKowXDBwLNk1Fby-H1HmnKlVcb_ePnzLHL6wmhNGyjVuJw5lHG-PqrHOzaoy6Aowehp_v3ZSNL6PN3qEkO6ashLoIlF9W87GBzpKt2R7tObMwKlOwJA-LB7aqWQOyDplu-89BB09lyAHcKjybSgKJm0RcDwu6RDW0G6aMbagBcLyQo25jqMkAPw7WHJduVzyYcyciqK134ldWeAL3utiTAvjx96lB9qbJJzAVmG_jakK3CVBGBHeBa9veEvg",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"cancelReason\":\"Gas leakage...\",\n\t\"manager\":\"5099803df3f4948bd2f98391\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

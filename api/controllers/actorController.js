@@ -280,6 +280,35 @@ exports.getTripApplicationsByActorV2 = async function(req, res) {
     }
 };
 
+exports.getManagerTripsV1 = function (req, res) {
+    var query = { 'manager': req.params.actorId }
+    Trip.find(query, function (err, trips) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.json(trips);
+        }
+    })
+}
+
+exports.getManagerTripsV2 = async function (req, res) {
+    var idToken = req.headers['idToken'];
+    var authenticatedActorId = await authController.getUserId(idToken);
+    var query = { 'manager': req.params.actorId }
+    if (req.params.actorId == authenticatedActorId) {
+    Trip.find(query, function (err, trips) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.json(trips);
+        }
+    })
+    } else {
+        res.status(403);
+        res.json({message: 'Forbidden. A manager can only see all the trips created by himself.', error: err});
+    }
+}
+
 
 
 /** Cube methods */  

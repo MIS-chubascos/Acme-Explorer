@@ -21,6 +21,9 @@ module.exports = function (app) {
         .get(actors.getTripApplicationsByActorV1);
 
 
+    app.route(V1_API_PATH + '/actors/:actorId/trips')
+        .get(actors.getManagerTripsV1)
+
     // V2 methods cheching roles (middleware or in the method indeed)
     app.route(V2_API_PATH + '/actors/:actorId')
         .post(actors.createAnActorVerified)
@@ -33,9 +36,8 @@ module.exports = function (app) {
     app.route(V2_API_PATH + '/actors/:actorId/tripApplications')
         .get(authController.verifyUser(['EXPLORER', 'MANAGER']), actors.getTripApplicationsByActorV2);
         
-                                        
-
-
+    app.route(V2_API_PATH + '/actors/:actorId/trips')
+        .get(authController.verifyUser(['MANAGER']), actors.getManagerTripsV2)                                   
 
     //given an explorer and a period, return the result of query. check 'sumPrice' atribute 
     app.route(V1_API_PATH +'/actors/cubeDataMoney/:explorer/:period')
