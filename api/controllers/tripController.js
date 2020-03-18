@@ -10,7 +10,7 @@ var tripApplicationController = require('./tripApplicationController');
 
 // CRUD methods
 exports.getAllTrips = function (req, res) {
-    var query = {}
+    var query = {'publicationDate': { $lte: new Date() }, 'cancelReason': null }
     if (req.query.k) {
         query['$text'] = { $search: keyword };
     }
@@ -54,7 +54,37 @@ exports.createTrip = async function (req, res) {
     })
 }
 
-exports.updateTrip = async function (req, res) {
+exports.updateTripV1 = function (req, res) {
+    Trip.findById(req.params.tripId, function (err, trip) {
+        if (err) {
+            res.send(err);
+        } else if (trip.publicationDate <= new Date() ) {
+            res.status(403);
+            res.json({message: 'Forbidden. The trip is already published.', error: err});
+        } else {
+            var updatedTrip = req.body;
+            trip.title = updatedTrip.title;
+            trip.description = updatedTrip.description;
+            trip.requirements = updatedTrip.requirements;
+            trip.pictures = updatedTrip.pictures;
+            trip.stages = updatedTrip.stages;
+            trip.startDate = updatedTrip.startDate;
+            trip.endDate = updatedTrip.endDate;
+            trip.publicationDate = updatedTrip.publicationDate;
+            trip.cancelReason = updatedTrip.cancelReason;
+            trip.save(function (error, newTrip) {
+                if (error) {
+                    res.send(error);
+                }
+                else {
+                    res.json(newTrip);
+                }
+            });
+        }
+    })
+}
+
+exports.updateTripV2 = async function (req, res) {
     var idToken = req.headers['idToken'];
     var authenticatedActorId = await authController.getUserId(idToken);
 
@@ -93,7 +123,26 @@ exports.updateTrip = async function (req, res) {
     }
 }
 
-exports.deleteTrip = async function (req, res) {
+exports.deleteTripV1 = async function (req, res) {
+    Trip.findById(req.params.tripId, function (err, trip) {
+        if (err) {
+            res.send(err);
+        } else if (trip.publicationDate <= new Date() ) {
+            res.status(403);
+            res.json({message: 'Forbidden. The trip is already published.',error: err});
+        } else {
+            Trip.findOneAndDelete({ _id: req.params.tripId }, function (err, trip) {
+                if (err) {
+                    res.send(err);
+                } else {
+                    res.json({ message: 'Trip successfully removed.' })
+                }
+            })
+        }
+    });
+}
+
+exports.deleteTripV2 = async function (req, res) {
     var idToken = req.headers['idToken'];
     var authenticatedActorId = await authController.getUserId(idToken);
 
@@ -208,7 +257,29 @@ exports.createTripApplicationV2 = async function (req, res) {
 };
 
 // Other methods
-exports.cancelTrip = async function (req, res) {
+exports.cancelTripV1 = async function (req, res) {
+    Trip.findById(req.params.tripId, function (err, trip) {
+        if (err) {
+            res.send(err);
+        } else if (trip.startDate <= new Date() 
+            || tripApplicationController.getAcceptedTripApplications(req.params.tripId) <= 0) { 
+            res.json({message: 'Forbidden. The trip has started or has accepted applications.',error: err});
+        } else {
+            trip.cancelReason = req.body.cancelReason;
+            trip.save(function (error, newTrip) {
+                if (error) {
+                    res.send(error);
+                }
+                else {
+                    res.json(newTrip);
+                }
+            });
+                    
+        }
+    });
+}
+
+exports.cancelTripV2 = async function (req, res) {
     var idToken = req.headers['idToken'];
     var authenticatedActorId = await authController.getUserId(idToken);
 
@@ -217,16 +288,19 @@ exports.cancelTrip = async function (req, res) {
             if (err) {
                 res.send(err);
             } else if (trip.startDate <= new Date() 
-                && tripApplicationController.getAcceptedTripApplications(req.params.tripId) <= 0) { 
-                res.json({message: 'Forbidden. The trip has started.',error: err});
+                || tripApplicationController.getAcceptedTripApplications(req.params.tripId) <= 0) { 
+                res.json({message: 'Forbidden. The trip has started or has accepted applications.',error: err});
             } else {
-                Trip.findOneAndDelete({ _id: req.params.tripId }, function (err, trip) {
-                    if (err) {
-                        res.send(err);
-                    } else {
-                        res.json({ message: 'Trip successfully removed.' })
+                trip.cancelReason = req.body.cancelReason;
+                trip.save(function (error, newTrip) {
+                    if (error) {
+                        res.send(error);
                     }
-                })
+                    else {
+                        res.json(newTrip);
+                    }
+                });
+                        
             }
         });
     } else {
