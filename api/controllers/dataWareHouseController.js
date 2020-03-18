@@ -77,9 +77,9 @@ exports.populate = function (req, res) {
         dummyTrip.__v = 0;
 
         totalPrice = 0
-        for (var i = 0; i < dummyTrip.stages.length; i++) {
-            dummyTrip.stages[i].order = i;
-            totalPrice += dummyTrip.stages[i].price;
+        for (var j = 0; j < dummyTrip.stages.length; j++) {
+            dummyTrip.stages[j].order = j;
+            totalPrice += dummyTrip.stages[j].price;
         }
         dummyTrip.price = totalPrice;
         dummies['trips'].push(dummyTrip)

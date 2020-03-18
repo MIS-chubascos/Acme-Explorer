@@ -8,12 +8,12 @@ module.exports = function(app) {
 
     // V1 methods
     app.route(V1_API_PATH + '/tripApplications/:tripApplicationId')
-        .get(tripApplications.getTripApplication)
-        .put(tripApplications.updateTripApplication);
+        .get(tripApplications.getTripApplicationV1)
+        .put(tripApplications.updateTripApplicationV1);
 
     // V2 methods
     app.route(V2_API_PATH + '/tripApplications/:tripApplicationId')
-        .get(authController.verifyUser(['EXPLORER', 'MANAGER']), tripApplications.getTripApplication)
-        .put(authController.verifyUser(['EXPLORER', 'MANAGER']), tripApplications.updateTripApplication);
+        .get(authController.verifyUser(['EXPLORER', 'MANAGER']), tripApplications.getTripApplicationV2)
+        .put(authController.verifyUser(['EXPLORER', 'MANAGER']), tripApplications.updateTripApplicationV2);
 
 }

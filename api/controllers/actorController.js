@@ -223,7 +223,8 @@ exports.deleteAnActor = async function (req, res) {
 
 
 
-exports.getTripApplicationsByActor = function(req, res) {
+
+exports.getTripApplicationsByActorV1 = function(req, res) {
     var query = {};
 
     if (req.query.explorer == "true") {
@@ -241,6 +242,31 @@ exports.getTripApplicationsByActor = function(req, res) {
             res.send(tripApplications);
         }
     });
+};
+
+exports.getTripApplicationsByActorV2 = async function(req, res) {
+    var idToken = req.headers['idToken'];
+    var authenticatedActorId = await authController.getUserId(idToken);
+
+    var query = {};
+
+    if (req.query.explorer == "true") {
+        query.explorer = req.params.actorId;
+
+    } else {
+        query.manager = req.params.actorId;
+    }
+
+    if (req.params.actorId == authenticatedActorId) {
+        TripApplication.find(query).sort({status: 'asc'}).exec(function(err, tripApplications) {
+            if (err) {
+                res.status(500).send(err);
+    
+            } else {
+                res.send(tripApplications);
+            }
+        });
+    }
 };
 
 

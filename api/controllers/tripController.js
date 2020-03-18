@@ -1,7 +1,8 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-    Trip = mongoose.model('Trip');
+    Trip = mongoose.model('Trip'),
+    TripApplication = mongoose.model('TripApplications');
 var Utils = require('../utils');
 var authController = require('./authController');
 var actorController = require('./actorController');
@@ -119,8 +120,49 @@ exports.deleteTrip = async function (req, res) {
     }
 }
 
+exports.createTripApplicationV1 = function (req, res) {
 
-exports.createTripApplication = async function (req, res) {
+    var newTripApplication = new TripApplication();
+    newTripApplication.comments = req.body.comments;
+    newTripApplication.trip = req.params.tripId;
+    newTripApplication.explorer = req.body.explorer;
+
+    Trip.findById(req.params.tripId, function (err, trip) {
+        if (err) {
+            res.status(500).send(err);
+
+        } else {
+            var now = new Date();
+
+            if (trip.publicationDate > now) {
+                res.status(422).send({ message: 'The corresponding trip has not been published yet' });
+
+            } else if (trip.startDate < now) {
+                res.status(422).send({ message: 'The corresponding trip has already started' });
+
+            } else if (trip.cancelReason) {
+                res.status(422).send({ message: 'The corresponding trip is cancelled' })
+
+            } else {
+                newTripApplication.save(function (err, tripApplication) {
+                    if (err) {
+                        if (err.name == 'ValidationError') {
+                            res.status(422).send(err);
+
+                        } else {
+                            res.status(500).send(err);
+                        }
+
+                    } else {
+                        res.json(tripApplication);
+                    }
+                });
+            }
+        }
+    });
+};
+
+exports.createTripApplicationV2 = async function (req, res) {
 
     var idToken = req.headers['idToken'];
     var authenticatedActorId = await authController.getUserId(idToken);

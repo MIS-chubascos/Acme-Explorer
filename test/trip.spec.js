@@ -6,19 +6,21 @@ var mongoose = require('mongoose'),
 
 const { expect } = chai;
 chai.use(chaiHttp);
-let trip;
 
-beforeEach(done => {
-  trip = new Trip({"title": "test_trip", "stages":[],"price": 1000, "endDate":"2025-03-18","startDate":"2025-03-13","description":"Amazing trip for otakus","requirements":"be careful with coronavirus","publicationDate":"2025-03-10","manager":"5099803df3f4948bd2f98391"})
-  trip.save().then(() => done());
-})
-
-afterEach(() => {
-  trip.remove({}, function(err){
-    console.log("Trip removed after tests.")
-  })
-})
 describe("Trip API Testing", () => {
+  let trip;
+  
+  beforeEach(done => {
+    trip = new Trip({"title": "test_trip", "stages":[],"price": 1000, "endDate":"2025-03-18","startDate":"2025-03-13","description":"Amazing trip for otakus","requirements":"be careful with coronavirus","publicationDate":"2025-03-10","manager":"5099803df3f4948bd2f98391"})
+    trip.save().then(() => done());
+  })
+  
+  afterEach(() => {
+    trip.remove({}, function(err){
+      console.log("Trip removed after tests.")
+    })
+  })
+
   it("Get Trips", done => {
     chai
       .request(app)

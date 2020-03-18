@@ -18,7 +18,7 @@ module.exports = function (app) {
         .delete(actors.deleteAnActor)
 
     app.route(V1_API_PATH + '/actors/:actorId/tripApplications')
-        .get(actors.getTripApplicationsByActor);
+        .get(actors.getTripApplicationsByActorV1);
 
 
     // V2 methods cheching roles (middleware or in the method indeed)
@@ -31,7 +31,7 @@ module.exports = function (app) {
                                         'SPONSOR']),actors.updateAnActorVerified)
     
     app.route(V2_API_PATH + '/actors/:actorId/tripApplications')
-        .get(authController.verifyUser(['EXPLORER', 'MANAGER']), actors.getTripApplicationsByActor);
+        .get(authController.verifyUser(['EXPLORER', 'MANAGER']), actors.getTripApplicationsByActorV2);
         
                                         
 

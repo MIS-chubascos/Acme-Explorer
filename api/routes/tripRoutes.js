@@ -19,7 +19,7 @@ module.exports = function(app) {
         .post(trips.cancelTrip)
 
     app.route(V1_API_PATH + '/trips/:tripId/tripApplications')
-        .post(trips.createTripApplication);
+        .post(trips.createTripApplicationV1);
 
     // V2 methods
     app.route(V2_API_PATH + '/trips')
@@ -33,6 +33,6 @@ module.exports = function(app) {
         .post(authController.verifyUser(['MANAGER']), trips.cancelTrip);
 
     app.route(V2_API_PATH + '/trips/:tripId/tripApplications')
-        .post(authController.verifyUser(['EXPLORER']), trips.createTripApplication);
+        .post(authController.verifyUser(['EXPLORER']), trips.createTripApplicationV2);
         
 }

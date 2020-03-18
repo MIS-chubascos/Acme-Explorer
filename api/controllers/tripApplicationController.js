@@ -5,7 +5,19 @@ TripApplication = mongoose.model('TripApplications'),
 Trip = mongoose.model('Trip');
 var authController = require('./authController');
 
-exports.getTripApplication = async function(req, res) {
+exports.getTripApplicationV1 = function(req, res) {
+    
+    TripApplication.findById(req.params.tripApplicationId, function(err, tripApplication) {
+        if (err) {
+            res.status(500).send(err);
+
+        } else {
+            res.json(tripApplication);
+        }
+    });
+};
+
+exports.getTripApplicationV2 = async function(req, res) {
 
     var idToken = req.headers['idToken'];
     var authenticatedActorId = await authController.getUserId(idToken);
@@ -25,7 +37,40 @@ exports.getTripApplication = async function(req, res) {
     });
 };
 
-exports.updateTripApplication = async function(req, res) {
+exports.updateTripApplicationV1 = function(req, res) {
+
+    TripApplication.findById(req.params.tripApplicationId, function(err, oldTripApplication) {
+        if (err) {
+            console.log("ERR: " + err);
+            res.status(500).send(err);
+        } else {
+
+            if ((oldTripApplication.status == 'PENDING' && req.body.status == 'REJECTED' && req.body.rejectedReason != null && req.body.paidDate == null)
+                || (oldTripApplication.status == 'PENDING' && req.body.status == 'DUE' && req.body.rejectedReason == null && req.body.paidDate == null)
+                || (oldTripApplication.status == 'DUE' && req.body.status == 'ACCEPTED' && req.body.rejectedReason == null && req.body.paidDate != null)
+                || (oldTripApplication.status == 'PENDING' && req.body.status == 'CANCELLED' && req.body.rejectedReason == null && req.body.paidDate == null)
+                || (oldTripApplication.status == 'ACCEPTED' && req.body.status == 'CANCELLED' && req.body.rejectedReason == null && req.body.paidDate == null)) {
+
+                    TripApplication.findOneAndUpdate({_id: req.params.tripApplicationId}, 
+                        {status: req.body.status, rejectedReason: req.body.rejectedReason, paidDate: req.body.paidDate}, 
+                        {new: true}, function(err, newTripApplication) {
+                        
+                            if (err) {
+                                console.log("ERR: " + err);
+                                res.status(500).send(err);
+            
+                            } else {
+                                res.json(newTripApplication);
+                            }
+                    });
+            } else {
+                res.status(422).send({message: 'Unsupported operation'});
+            }
+        }
+    });
+};
+
+exports.updateTripApplicationV2 = async function(req, res) {
 
     var idToken = req.headers['idToken'];
     var authenticatedActorId = await authController.getUserId(idToken);
