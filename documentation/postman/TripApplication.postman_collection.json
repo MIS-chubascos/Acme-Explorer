@@ -1,0 +1,198 @@
+{
+	"info": {
+		"_postman_id": "023696c7-36be-4c40-8329-a5ca01fb4c5b",
+		"name": "ACME Explorer Copy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "POST /trips/:tripId/tripApplications",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"_id\": \"test_application\",\n\"moment\": \"2020-05-05\",\n\"status\": \"PENDING\",\n\"trip\": \"test_trip\",\n\"explorer\": \"5e70d1287f84552e60a04a6d\",\n\"manager\": \"test_manager\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8080/api/v1/trips/5e72415452289a5f0c26f0e6/tripApplications",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"trips",
+						"5e72415452289a5f0c26f0e6",
+						"tripApplications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /tripApplications/:tripApplicationId",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:8080/api/v1/tripApplications/5e7244072f0511262848188c",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"tripApplications",
+						"5e7244072f0511262848188c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT /tripApplications/:tripApplicationId",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"status\": \"DUE\",\r\n    \"_id\": \"5e72032349179c55b44c41ee\",\r\n    \"trip\": \"5e72032349179c55b44c41e3\",\r\n    \"manager\": \"5e72032349179c55b44c41dd\",\r\n    \"comments\": \"Wade5\",\r\n    \"explorer\": \"5e72032349179c55b44c41e7\",\r\n    \"moment\": \"2020-03-18T11:23:51.081Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8080/api/v1/tripApplications/5e7244072f0511262848188c",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"tripApplications",
+						"5e7244072f0511262848188c"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /actors/:actorId/tripApplications?explorer=true",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"status\": \"ACCEPTED\",\r\n    \"_id\": \"5e5d321d64f3b00830f23b06\",\r\n    \"trip\": \"5e5d321d64f3b00830f23af7\",\r\n    \"manager\": \"5e5d321d64f3b00830f23af2\",\r\n    \"comments\": \"Valentin_Connelly16\",\r\n    \"moment\": \"2020-03-02T16:21:01.684Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8080/api/v1/actors/5e70d1287f84552e60a04a6d/tripApplications?explorer=true",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"actors",
+						"5e70d1287f84552e60a04a6d",
+						"tripApplications"
+					],
+					"query": [
+						{
+							"key": "explorer",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /actors/:actorId/tripApplications?explorer=false",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"status\": \"ACCEPTED\",\r\n    \"_id\": \"5e5d321d64f3b00830f23b06\",\r\n    \"trip\": \"5e5d321d64f3b00830f23af7\",\r\n    \"manager\": \"5e5d321d64f3b00830f23af2\",\r\n    \"comments\": \"Valentin_Connelly16\",\r\n    \"moment\": \"2020-03-02T16:21:01.684Z\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8080/api/v1/actors/5e722b43ff6b0e2a28f5b683/tripApplications?explorer=false",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"actors",
+						"5e722b43ff6b0e2a28f5b683",
+						"tripApplications"
+					],
+					"query": [
+						{
+							"key": "explorer",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

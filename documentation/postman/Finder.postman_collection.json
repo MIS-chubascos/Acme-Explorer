@@ -1,0 +1,119 @@
+{
+	"info": {
+		"_postman_id": "b39f1851-afa5-4c78-9cba-eacb817e94b9",
+		"name": "ACME Explorer Copy Copy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET /finders/:finderId",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://localhost:8080/api/v1/finders/5e72415452289a5f0c26f0f0",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"finders",
+						"5e72415452289a5f0c26f0f0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT /finders/:finderId",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"keyword\": \"hola\",\r\n    \"maxPrice\": 500\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8080/api/v1/finders/5e72415452289a5f0c26f0f9",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"finders",
+						"5e72415452289a5f0c26f0f9"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /finders/:finderId/trips",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"keyword\": \"hola\",\r\n    \"maxPrice\": 500\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:8080/api/v1/finders/5e72415452289a5f0c26f0f9/trips",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"finders",
+						"5e72415452289a5f0c26f0f9",
+						"trips"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
