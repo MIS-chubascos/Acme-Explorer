@@ -86,12 +86,14 @@ routesLogin(app);
 //Switch for front or back test
 console.log("Connecting DB to: " + mongoDBURI);
 mongoose.connection.on("open", function (err, conn) {
-   //Front test for logging https off
-    app.listen(port, function () {
+   
+//Front test for logging https off
+    /*app.listen(port, function () {
         console.log('ACME-Explorer RESTful API server started on: ' + port);
-    });
-    //Back test, https on. Postman working
-    //https.createServer(options, app).listen(port) 
+    });*/
+   
+//Back test, https on. Postman working
+    https.createServer(options, app).listen(port) 
 });
 
 mongoose.connection.on("error", function (err, conn) {
