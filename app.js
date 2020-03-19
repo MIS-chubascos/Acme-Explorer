@@ -9,9 +9,10 @@ var express = require('express'),
   Sponsorship = require('./api/models/sponsorshipModel'),
   Actor = require('./api/models/actorModel'),
   DataWareHouse = require('./api/models/dataWareHouseModel'),
-  bodyParser = require('body-parser');
-  admin = require('firebase-admin')
-  serviceAccount = require('./acme-explorer-dc987-firebase-adminsdk-wn4ll-55a133b081.json')
+  DataWareHouseController = require('./api/controllers/dataWareHouseController'),
+  bodyParser = require('body-parser'),
+  admin = require('firebase-admin'),
+  serviceAccount = require('./acme-explorer-dc987-firebase-adminsdk-wn4ll-55a133b081.json');
 
 var fs = require('fs');
 var https = require('https');
@@ -100,8 +101,6 @@ mongoose.connection.on("error", function (err, conn) {
     console.error("DB init error " + err);
 });
 
+DataWareHouseController.createDataWareHouseJob();
+
 module.exports= app;
-
-
-
-
