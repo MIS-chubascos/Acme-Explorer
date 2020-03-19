@@ -11,6 +11,9 @@ exports.getTripApplicationV1 = function(req, res) {
         if (err) {
             res.status(500).send(err);
 
+        } else if (!tripApplication) {
+            res.status(404).send({message: "No trip application found for the given ID"});
+
         } else {
             res.json(tripApplication);
         }
@@ -25,6 +28,9 @@ exports.getTripApplicationV2 = async function(req, res) {
     TripApplication.findById(req.params.tripApplicationId, function(err, tripApplication) {
         if (err) {
             res.status(500).send(err);
+        
+        } else if (!tripApplication) {
+            res.status(404).send({message: "No trip application found for the given ID"});
 
         } else {
             if (authenticatedActorId == tripApplication.explorer || authenticatedActorId == tripApplication.manager) {
@@ -41,10 +47,12 @@ exports.updateTripApplicationV1 = function(req, res) {
 
     TripApplication.findById(req.params.tripApplicationId, function(err, oldTripApplication) {
         if (err) {
-            console.log("ERR: " + err);
             res.status(500).send(err);
-        } else {
 
+        } else if (!oldTripApplication) {
+            res.status(404).send({message: "No trip application found for the given ID"});
+
+        } else {
             if ((oldTripApplication.status == 'PENDING' && req.body.status == 'REJECTED' && req.body.rejectedReason != null && req.body.paidDate == null)
                 || (oldTripApplication.status == 'PENDING' && req.body.status == 'DUE' && req.body.rejectedReason == null && req.body.paidDate == null)
                 || (oldTripApplication.status == 'DUE' && req.body.status == 'ACCEPTED' && req.body.rejectedReason == null && req.body.paidDate != null)
@@ -56,7 +64,6 @@ exports.updateTripApplicationV1 = function(req, res) {
                         {new: true}, function(err, newTripApplication) {
                         
                             if (err) {
-                                console.log("ERR: " + err);
                                 res.status(500).send(err);
             
                             } else {
@@ -79,6 +86,9 @@ exports.updateTripApplicationV2 = async function(req, res) {
         TripApplication.findById(req.params.tripApplicationId, function(err, oldTripApplication) {
             if(err) {
                 res.status(500).send(err);
+            
+            } else if (!oldTripApplication) {
+                res.status(404).send({message: "No trip application found for the given ID"});
 
             } else if ((oldTripApplication.status == 'DUE' && req.body.status == 'ACCEPTED' && req.body.rejectedReason == null && req.body.paidDate != null)
                         || (oldTripApplication.status == 'PENDING' && req.body.status == 'CANCELLED' && req.body.rejectedReason == null && req.body.paidDate == null)

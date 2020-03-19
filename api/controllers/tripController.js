@@ -190,8 +190,12 @@ exports.createTripApplicationV1 = function (req, res) {
     newTripApplication.explorer = req.body.explorer;
 
     Trip.findById(req.params.tripId, function (err, trip) {
-        if (err || trip == null) {
-            res.status(500).send("Error finding trip with id " + String(req.params.tripId));
+        if (err) {
+            res.status(500).send(err);
+        
+        } else if (!trip) {
+            res.status(404).send({message: "No trip found for the given ID"});
+
         } else {
             var now = new Date();
             if (trip.publicationDate > now) {
@@ -233,8 +237,12 @@ exports.createTripApplicationV2 = async function (req, res) {
     newTripApplication.explorer = authenticatedActorId;
 
     Trip.findById(req.params.tripId, function (err, trip) {
-        if (err || trip == null) {
-            res.status(500).send("Error finding trip with id " + String(req.params.tripId));
+        if (err) {
+            res.status(500).send(err);
+
+        } else if (!trip) {
+            res.status(404).send({message: "No trip found for the given ID"});
+
         } else {
             var now = new Date();
             if (trip.publicationDate > now) {
@@ -318,9 +326,8 @@ exports.cancelTripV2 = async function (req, res) {
     }
 }
 
-exports.searchTrips = function (keyword, minPrice, maxPrice, startDate, endDate) {
+exports.searchTrips = async function (keyword, minPrice, maxPrice, startDate, endDate) {
     var query = Utils.computeTripsQuery(keyword, minPrice, maxPrice, startDate, endDate);
-    Trip.find(query, function (err, trips) {
-        return trips;
-    })
+    var resultTrips = await Trip.find(query).exec();
+    return resultTrips;
 }
