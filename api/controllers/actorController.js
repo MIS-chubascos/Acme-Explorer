@@ -91,7 +91,7 @@ exports.createAnActorVerified = async function(req, res){
 
 exports.readAnActor = function (req, res) {
     Actor.findById(req.params.actorId, function (err, actor) {
-        if (err) {
+        if (err || !actor) {
             res.send(err);
         }
         else {
@@ -104,7 +104,7 @@ exports.readAnActor = function (req, res) {
 //Email can't be updated considering that is the account's loggin method (?)
 exports.updateAnActor = function (req, res) {
     Actor.findById(req.params.actorId, function (err, actor) {
-        if (err) {
+        if (err || !actor) {
             res.status(500).send(err);
         } else {
             Actor.findOneAndUpdate({ _id: req.params.actorId }, 
@@ -134,7 +134,7 @@ exports.updateAnActor = function (req, res) {
 exports.updateAnActorVerified = function(req,res){
     //Actors can update themselves, admin can update anyone
     Actor.findById(req.params.actorId, async function(err,actor){
-        if(err){
+        if(err || !actor){
             res.send(err);
         }else{
             var idToken = req.headers['idtoken']; //custom token in req.header created by FB
