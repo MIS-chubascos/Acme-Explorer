@@ -1,0 +1,161 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Sponsorships",
+		"_postman_id": "8695b58f-6714-61ed-c728-ebcbbd174f1c",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create a new sponsorship",
+			"request": {
+				"url": "http://localhost:8080/api/v1/sponsorships",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "idToken",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTU4NDI5NzkxMiwiZXhwIjoxNTg0MzAxNTEyLCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay13bjRsbEBhY21lLWV4cGxvcmVyLWRjOTg3LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwic3ViIjoiZmlyZWJhc2UtYWRtaW5zZGstd240bGxAYWNtZS1leHBsb3Jlci1kYzk4Ny5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInVpZCI6ImNhbWlsYXJleXllc0BnbWFpbC5jb20ifQ.VqHQkfyjf_mmy8GDLpeBxZbeV9u8o50k1vIEC4pZgJFKVLs5IMs5e5ZBjV7D8JmuX7VTf6Z2tbO0g_92jTyXLhf3sbrKowXDBwLNk1Fby-H1HmnKlVcb_ePnzLHL6wmhNGyjVuJw5lHG-PqrHOzaoy6Aowehp_v3ZSNL6PN3qEkO6ashLoIlF9W87GBzpKt2R7tObMwKlOwJA-LB7aqWQOyDplu-89BB09lyAHcKjybSgKJm0RcDwu6RDW0G6aMbagBcLyQo25jqMkAPw7WHJduVzyYcyciqK134ldWeAL3utiTAvjx96lB9qbJJzAVmG_jakK3CVBGBHeBa9veEvg",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"trip\": \"5e737cc3fbbc8c245c44b0d5\", \n\t\"banner\":\"rose_jisoo_lisa_jennie\",\n\t\"sponsor\":\"5e737cc3fbbc8c245c44b0d9\",\n\t\"url\": \"http://blackpinkofficial.com/\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new sponsorship copy",
+			"request": {
+				"url": "http://localhost:8080/api/v1/sponsorships/5e737d61c137e52998b1170a",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "idToken",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTU4NDI5NzkxMiwiZXhwIjoxNTg0MzAxNTEyLCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay13bjRsbEBhY21lLWV4cGxvcmVyLWRjOTg3LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwic3ViIjoiZmlyZWJhc2UtYWRtaW5zZGstd240bGxAYWNtZS1leHBsb3Jlci1kYzk4Ny5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInVpZCI6ImNhbWlsYXJleXllc0BnbWFpbC5jb20ifQ.VqHQkfyjf_mmy8GDLpeBxZbeV9u8o50k1vIEC4pZgJFKVLs5IMs5e5ZBjV7D8JmuX7VTf6Z2tbO0g_92jTyXLhf3sbrKowXDBwLNk1Fby-H1HmnKlVcb_ePnzLHL6wmhNGyjVuJw5lHG-PqrHOzaoy6Aowehp_v3ZSNL6PN3qEkO6ashLoIlF9W87GBzpKt2R7tObMwKlOwJA-LB7aqWQOyDplu-89BB09lyAHcKjybSgKJm0RcDwu6RDW0G6aMbagBcLyQo25jqMkAPw7WHJduVzyYcyciqK134ldWeAL3utiTAvjx96lB9qbJJzAVmG_jakK3CVBGBHeBa9veEvg",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"trip\": \"5e737cc3fbbc8c245c44b0d5\", \n\t\"banner\":\"rose_jisoo_lisa_jennie\",\n\t\"sponsor\":\"5e737cc3fbbc8c245c44b0d9\",\n\t\"url\": \"http://blackpinkofficial2.com/\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get sponsor's sponsorships",
+			"request": {
+				"url": "http://localhost:8080/api/v1/actors/5e737cc3fbbc8c245c44b0d9/sponsorships",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "idToken",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTU4NDI5NzkxMiwiZXhwIjoxNTg0MzAxNTEyLCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay13bjRsbEBhY21lLWV4cGxvcmVyLWRjOTg3LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwic3ViIjoiZmlyZWJhc2UtYWRtaW5zZGstd240bGxAYWNtZS1leHBsb3Jlci1kYzk4Ny5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInVpZCI6ImNhbWlsYXJleXllc0BnbWFpbC5jb20ifQ.VqHQkfyjf_mmy8GDLpeBxZbeV9u8o50k1vIEC4pZgJFKVLs5IMs5e5ZBjV7D8JmuX7VTf6Z2tbO0g_92jTyXLhf3sbrKowXDBwLNk1Fby-H1HmnKlVcb_ePnzLHL6wmhNGyjVuJw5lHG-PqrHOzaoy6Aowehp_v3ZSNL6PN3qEkO6ashLoIlF9W87GBzpKt2R7tObMwKlOwJA-LB7aqWQOyDplu-89BB09lyAHcKjybSgKJm0RcDwu6RDW0G6aMbagBcLyQo25jqMkAPw7WHJduVzyYcyciqK134ldWeAL3utiTAvjx96lB9qbJJzAVmG_jakK3CVBGBHeBa9veEvg",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"trip\": \"5e737cc3fbbc8c245c44b0d5\", \n\t\"banner\":\"rose_jisoo_lisa_jennie\",\n\t\"sponsor\":\"5e737cc3fbbc8c245c44b0d9\",\n\t\"url\": \"http://blackpinkofficial.com/\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get sponsorship by id",
+			"request": {
+				"url": "http://localhost:8080/api/v1/sponsorships/5e737d61c137e52998b1170a",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "idToken",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTU4NDI5NzkxMiwiZXhwIjoxNTg0MzAxNTEyLCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay13bjRsbEBhY21lLWV4cGxvcmVyLWRjOTg3LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwic3ViIjoiZmlyZWJhc2UtYWRtaW5zZGstd240bGxAYWNtZS1leHBsb3Jlci1kYzk4Ny5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInVpZCI6ImNhbWlsYXJleXllc0BnbWFpbC5jb20ifQ.VqHQkfyjf_mmy8GDLpeBxZbeV9u8o50k1vIEC4pZgJFKVLs5IMs5e5ZBjV7D8JmuX7VTf6Z2tbO0g_92jTyXLhf3sbrKowXDBwLNk1Fby-H1HmnKlVcb_ePnzLHL6wmhNGyjVuJw5lHG-PqrHOzaoy6Aowehp_v3ZSNL6PN3qEkO6ashLoIlF9W87GBzpKt2R7tObMwKlOwJA-LB7aqWQOyDplu-89BB09lyAHcKjybSgKJm0RcDwu6RDW0G6aMbagBcLyQo25jqMkAPw7WHJduVzyYcyciqK134ldWeAL3utiTAvjx96lB9qbJJzAVmG_jakK3CVBGBHeBa9veEvg",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"trip\": \"5e737cc3fbbc8c245c44b0d5\", \n\t\"banner\":\"rose_jisoo_lisa_jennie\",\n\t\"sponsor\":\"5e737cc3fbbc8c245c44b0d9\",\n\t\"url\": \"http://blackpinkofficial.com/\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get random sponsorship for trip",
+			"request": {
+				"url": "http://localhost:8080/api/v1/trips/5e737cc3fbbc8c245c44b0d5/randomSponsorship",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "idToken",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTU4NDI5NzkxMiwiZXhwIjoxNTg0MzAxNTEyLCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay13bjRsbEBhY21lLWV4cGxvcmVyLWRjOTg3LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwic3ViIjoiZmlyZWJhc2UtYWRtaW5zZGstd240bGxAYWNtZS1leHBsb3Jlci1kYzk4Ny5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInVpZCI6ImNhbWlsYXJleXllc0BnbWFpbC5jb20ifQ.VqHQkfyjf_mmy8GDLpeBxZbeV9u8o50k1vIEC4pZgJFKVLs5IMs5e5ZBjV7D8JmuX7VTf6Z2tbO0g_92jTyXLhf3sbrKowXDBwLNk1Fby-H1HmnKlVcb_ePnzLHL6wmhNGyjVuJw5lHG-PqrHOzaoy6Aowehp_v3ZSNL6PN3qEkO6ashLoIlF9W87GBzpKt2R7tObMwKlOwJA-LB7aqWQOyDplu-89BB09lyAHcKjybSgKJm0RcDwu6RDW0G6aMbagBcLyQo25jqMkAPw7WHJduVzyYcyciqK134ldWeAL3utiTAvjx96lB9qbJJzAVmG_jakK3CVBGBHeBa9veEvg",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"trip\": \"5e737cc3fbbc8c245c44b0d5\", \n\t\"banner\":\"rose_jisoo_lisa_jennie\",\n\t\"sponsor\":\"5e737cc3fbbc8c245c44b0d9\",\n\t\"url\": \"http://blackpinkofficial.com/\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get sponsorship by id copy",
+			"request": {
+				"url": "http://localhost:8080/api/v1/sponsorships/5e737d61c137e52998b1170a",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "idToken",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTU4NDI5NzkxMiwiZXhwIjoxNTg0MzAxNTEyLCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay13bjRsbEBhY21lLWV4cGxvcmVyLWRjOTg3LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwic3ViIjoiZmlyZWJhc2UtYWRtaW5zZGstd240bGxAYWNtZS1leHBsb3Jlci1kYzk4Ny5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInVpZCI6ImNhbWlsYXJleXllc0BnbWFpbC5jb20ifQ.VqHQkfyjf_mmy8GDLpeBxZbeV9u8o50k1vIEC4pZgJFKVLs5IMs5e5ZBjV7D8JmuX7VTf6Z2tbO0g_92jTyXLhf3sbrKowXDBwLNk1Fby-H1HmnKlVcb_ePnzLHL6wmhNGyjVuJw5lHG-PqrHOzaoy6Aowehp_v3ZSNL6PN3qEkO6ashLoIlF9W87GBzpKt2R7tObMwKlOwJA-LB7aqWQOyDplu-89BB09lyAHcKjybSgKJm0RcDwu6RDW0G6aMbagBcLyQo25jqMkAPw7WHJduVzyYcyciqK134ldWeAL3utiTAvjx96lB9qbJJzAVmG_jakK3CVBGBHeBa9veEvg",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"trip\": \"5e737cc3fbbc8c245c44b0d5\", \n\t\"banner\":\"rose_jisoo_lisa_jennie\",\n\t\"sponsor\":\"5e737cc3fbbc8c245c44b0d9\",\n\t\"url\": \"http://blackpinkofficial.com/\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
