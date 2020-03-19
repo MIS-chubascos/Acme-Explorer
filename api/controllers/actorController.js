@@ -3,7 +3,8 @@
 var mongoose = require('mongoose'),
     Actor = mongoose.model('Actors'),
     TripApplication = mongoose.model('TripApplications'),
-    Trip = mongoose.model('Trip');
+    Trip = mongoose.model('Trip'),
+    Sponsorship = mongoose.model('Sponsorships');
 var authController = require('./authController')
 var admin = require('firebase-admin');
 var finderController = require('./finderController');
@@ -306,6 +307,35 @@ exports.getManagerTripsV2 = async function (req, res) {
     } else {
         res.status(403);
         res.json({message: 'Forbidden. A manager can only see all the trips created by himself.', error: err});
+    }
+}
+
+exports.getSponsorSponsorshipsV1 = function (req, res) {
+    var query = { 'sponsor': req.params.actorId }
+    Sponsorship.find(query, function (err, sponsorships) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.json(sponsorships);
+        }
+    })
+}
+
+exports.getSponsorSponsorshipsV2 = async function (req, res) {
+    var idToken = req.headers['idToken'];
+    var authenticatedActorId = await authController.getUserId(idToken);
+    var query = { 'sponsor': req.params.actorId }
+    if (req.params.actorId == authenticatedActorId) {
+        Sponsorship.find(query, function (err, sponsorships) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.json(sponsorships);
+        }
+    })
+    } else {
+        res.status(403);
+        res.json({message: 'Forbidden. A sponsor can only see all the sponsorships created by himself.', error: err});
     }
 }
 
