@@ -18,8 +18,7 @@ var SponsorshipSchema = new Schema({
       },
     banner: {
         type: Buffer, 
-        // contentType: String
-        //required: 'Please, add an image banner'
+        required: 'Please, add an image banner'
       },
     trip: {
         type: Schema.Types.ObjectId,
@@ -52,16 +51,4 @@ var SponsorshipSchema = new Schema({
         }
       }
 
-      SponsorshipSchema.pre('save', async function (callback){
-        const sponsor = await Actor.findById({_id: this.sponsor}); 
-        if (sponsor.flat_rate) {
-          console.log("Flat rate is true. The sponsorship payed");
-          this.payed = true;
-        }else{
-          console.log("Flat rate is false. The sponsorship didn't pay");
-        }
-        console.log(this.payed);
-        callback();
-        });
-
-    module.exports = mongoose.model('Sponsorships', SponsorshipSchema);
+module.exports = mongoose.model('Sponsorships', SponsorshipSchema);

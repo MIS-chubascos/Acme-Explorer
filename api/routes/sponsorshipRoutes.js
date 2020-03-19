@@ -9,16 +9,12 @@ module.exports = function (app) {
 
     // V1 methods
     app.route(V1_API_PATH + '/sponsorships')
-        .get(sponsorships.getAllSponsorships)
         .post(sponsorships.createSponsorship)
 
     app.route(V1_API_PATH + '/sponsorships/:sponsorshipId')
-        .get(sponsorships.getSponsorship)
-        .put(sponsorships.updateSponsorship)
-        .delete(sponsorships.deleteSponsorship)
-    
-    app.route(V1_API_PATH + '/trips/:tripId/sponsorships')
-        .get(sponsorships.getTripSponsorships)
+        .get(sponsorships.getSponsorshipV1)
+        .put(sponsorships.updateSponsorshipV1)
+        .delete(sponsorships.deleteSponsorshipV1)
 
     app.route(V1_API_PATH + '/trips/:tripId/randomSponsorship')
         .get(sponsorships.getTripRandomSponsorship)
@@ -27,10 +23,11 @@ module.exports = function (app) {
     // V2 methods
 
     app.route(V2_API_PATH + '/sponsorships')
-        .post(authController.verifyUser(['MANAGER','SPONSOR']), sponsorships.createSponsorship);
+        .post(authController.verifyUser(['SPONSOR']), sponsorships.createSponsorship);
 
     app.route(V2_API_PATH + '/sponsorships/:sponsorshipId')
-        .put(authController.verifyUser(['MANAGER','SPONSOR']), sponsorships.updateSponsorship)
-        .delete(authController.verifyUser(['MANAGER','SPONSOR']), sponsorships.deleteSponsorship);
+        .get(authController.verifyUser(['SPONSOR']), sponsorships.getSponsorshipV2)
+        .put(authController.verifyUser(['SPONSOR']), sponsorships.updateSponsorshipV2)
+        .delete(authController.verifyUser(['SPONSOR']), sponsorships.deleteSponsorshipV2);
 
     };
