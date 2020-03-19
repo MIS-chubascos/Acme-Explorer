@@ -118,28 +118,6 @@ exports.updateSponsorshipV2 = async function(req,res){
     }
 }
 
-
-exports.getAllSponsorships = function(req,res){
-    Sponsorship.find(function(err, sponsorship){
-        if(err){
-            res.status(500).send(err);
-        }else{
-            res.json(sponsorship);
-        }
-    });
-}
-
-exports.getTripSponsorships = function(req,res){
-    var tripId = req.params.tripId;
-    Sponsorship.find({ "trip": tripId, "payed": true }, function(err, sponsorships){
-        if(err){
-            res.status(500).send(err);
-        }else{
-            res.json(sponsorships);
-        }
-    });
-}
-
 exports.getTripRandomSponsorship = function(req,res){
     var tripId = req.params.tripId;
     Sponsorship.find({ "trip": tripId, "payed": true }, function(err, sponsorships){

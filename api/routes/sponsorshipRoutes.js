@@ -9,16 +9,12 @@ module.exports = function (app) {
 
     // V1 methods
     app.route(V1_API_PATH + '/sponsorships')
-        .get(sponsorships.getAllSponsorships)
         .post(sponsorships.createSponsorship)
 
     app.route(V1_API_PATH + '/sponsorships/:sponsorshipId')
         .get(sponsorships.getSponsorshipV1)
         .put(sponsorships.updateSponsorshipV1)
         .delete(sponsorships.deleteSponsorshipV1)
-    
-    app.route(V1_API_PATH + '/trips/:tripId/sponsorships')
-        .get(sponsorships.getTripSponsorships)
 
     app.route(V1_API_PATH + '/trips/:tripId/randomSponsorship')
         .get(sponsorships.getTripRandomSponsorship)
