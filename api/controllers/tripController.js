@@ -23,10 +23,23 @@ exports.getAllTrips = function (req, res) {
     })
 }
 
-exports.getTrip = function (req, res) {
+exports.getTripV1 = function (req, res) {
+    Trip.findById(req.params.tripId, function (err, trip) {
+        if (err || trip == null) {
+            res.send("Error finding trip with id " + String(req.params.tripId));
+        } else {
+            res.json(trip);
+        }
+    })
+}
+
+exports.getTripV2 = async function (req, res) {
+    var idToken = req.headers['idToken'];
+    var authenticatedActorId = await authController.getUserId(idToken);
     Trip.findById(req.params.tripId, function (err, trips) {
-        if (err) {
-            res.send(err);
+        if (err || trip == null || (authenticatedActorId != req.body.manager 
+                && req.body.publicationDate <= new Date())) {
+            res.send("Error finding trip with id " + String(req.params.tripId));
         } else {
             res.json(trips);
         }
@@ -35,8 +48,8 @@ exports.getTrip = function (req, res) {
 
 exports.getTripApplications = function (req, res) {
     Trip.findById(req.params.tripId, function (err, trips) {
-        if (err) {
-            res.send(err);
+        if (err || trip == null) {
+            res.send("Error finding trip with id " + String(req.params.tripId));
         } else {
             res.json(trips);
         }
@@ -56,8 +69,8 @@ exports.createTrip = async function (req, res) {
 
 exports.updateTripV1 = function (req, res) {
     Trip.findById(req.params.tripId, function (err, trip) {
-        if (err) {
-            res.send(err);
+        if (err || trip == null) {
+            res.send("Error finding trip with id " + String(req.params.tripId));
         } else if (trip.publicationDate <= new Date() ) {
             res.status(403);
             res.json({message: 'Forbidden. The trip is already published.', error: err});
@@ -90,8 +103,8 @@ exports.updateTripV2 = async function (req, res) {
 
     if (authenticatedActorId == req.body.manager) {
         Trip.findById(req.params.tripId, function (err, trip) {
-            if (err) {
-                res.send(err);
+            if (err || trip == null) {
+                res.send("Error finding trip with id " + String(req.params.tripId));
             } else if (trip.publicationDate <= new Date() ) {
                 res.status(403);
                 res.json({message: 'Forbidden. The trip is already published.', error: err});
@@ -125,8 +138,8 @@ exports.updateTripV2 = async function (req, res) {
 
 exports.deleteTripV1 = async function (req, res) {
     Trip.findById(req.params.tripId, function (err, trip) {
-        if (err) {
-            res.send(err);
+        if (err || trip == null) {
+            res.send("Error finding trip with id " + String(req.params.tripId));
         } else if (trip.publicationDate <= new Date() ) {
             res.status(403);
             res.json({message: 'Forbidden. The trip is already published.',error: err});
@@ -148,8 +161,8 @@ exports.deleteTripV2 = async function (req, res) {
 
     if (authenticatedActorId == req.body.manager) {
         Trip.findById(req.params.tripId, function (err, trip) {
-            if (err) {
-                res.send(err);
+            if (err || trip == null) {
+                res.send("Error finding trip with id " + String(req.params.tripId));
             } else if (trip.publicationDate <= new Date() ) {
                 res.status(403);
                 res.json({message: 'Forbidden. The trip is already published.',error: err});
@@ -177,12 +190,10 @@ exports.createTripApplicationV1 = function (req, res) {
     newTripApplication.explorer = req.body.explorer;
 
     Trip.findById(req.params.tripId, function (err, trip) {
-        if (err) {
-            res.status(500).send(err);
-
+        if (err || trip == null) {
+            res.status(500).send("Error finding trip with id " + String(req.params.tripId));
         } else {
             var now = new Date();
-
             if (trip.publicationDate > now) {
                 res.status(422).send({ message: 'The corresponding trip has not been published yet' });
 
@@ -222,12 +233,10 @@ exports.createTripApplicationV2 = async function (req, res) {
     newTripApplication.explorer = authenticatedActorId;
 
     Trip.findById(req.params.tripId, function (err, trip) {
-        if (err) {
-            res.status(500).send(err);
-
+        if (err || trip == null) {
+            res.status(500).send("Error finding trip with id " + String(req.params.tripId));
         } else {
             var now = new Date();
-
             if (trip.publicationDate > now) {
                 res.status(422).send({ message: 'The corresponding trip has not been published yet' });
 
@@ -259,8 +268,8 @@ exports.createTripApplicationV2 = async function (req, res) {
 // Other methods
 exports.cancelTripV1 = async function (req, res) {
     Trip.findById(req.params.tripId, function (err, trip) {
-        if (err) {
-            res.send(err);
+        if (err || trip == null) {
+            res.send("Error finding trip with id " + String(req.params.tripId));
         } else if (trip.startDate <= new Date() 
             || tripApplicationController.getAcceptedTripApplications(req.params.tripId) <= 0) { 
             res.json({message: 'Forbidden. The trip has started or has accepted applications.',error: err});
@@ -285,8 +294,8 @@ exports.cancelTripV2 = async function (req, res) {
 
     if (authenticatedActorId == req.body.manager) {
         Trip.findById(req.params.tripId, function (err, trip) {
-            if (err) {
-                res.send(err);
+            if (err || trip == null)  {
+                res.send("Error finding trip with id " + String(req.params.tripId));
             } else if (trip.startDate <= new Date() 
                 || tripApplicationController.getAcceptedTripApplications(req.params.tripId) <= 0) { 
                 res.json({message: 'Forbidden. The trip has started or has accepted applications.',error: err});

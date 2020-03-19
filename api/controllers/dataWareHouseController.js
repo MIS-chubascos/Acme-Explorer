@@ -238,10 +238,6 @@ exports.populate = function (req, res) {
     res.json(dummies);
 }
 
-
-
-
-
 var CronJob = require("cron").CronJob;
 var CronTime = require("cron").CronTime;
 
