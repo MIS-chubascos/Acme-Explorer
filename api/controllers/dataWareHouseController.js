@@ -278,6 +278,10 @@ function createDataWareHouseJob() {
             } else {
                 newDataWareHouse.avgMinMaxStdApplicationsPerTrip = results[0];
                 newDataWareHouse.ratioApplicationsByStatus = results[1];
+                newDataWareHouse.avgMinMaxStdTripsPerManager = results[2];
+                newDataWareHouse.avgMinMaxStdTripsPrice = results[3];
+                newDataWareHouse.avgPriceRangeFinders = results[4];
+                newDataWareHouse.topFinderKeywords = results[5];
 
                 newDataWareHouse.save(function(err, datawarehouse) {
                     if (err) {
@@ -305,7 +309,12 @@ function computeAvgMinMaxStdApplicationsPerTrip (callback) {
             stdApplicationsPerTrip: {"$stdDevPop": "$applications"}
         }}
     ], function(err, res) {
-        callback(err, [res[0].avgApplicationsPerTrip, res[0].minApplicationsPerTrip, res[0].maxApplicationsPerTrip, res[0].stdApplicationsPerTrip])
+        if (res[0]) {
+            callback(err, [res[0].avgApplicationsPerTrip, res[0].minApplicationsPerTrip, res[0].maxApplicationsPerTrip, res[0].stdApplicationsPerTrip]);
+
+        } else {
+            callback(err, []);
+        }
     });
 };
 
@@ -313,16 +322,28 @@ function computeRatioApplicationsByStatus (callback) {
     TripApplication.aggregate([
         {$facet: {
             totalSum: [{$group: {_id: null, totalSum: {$sum: 1}}}],
-            statusSum: [{$group: {_id: "$status", statusSum: {$sum: 1}}}]
+            pendingSum: [{$match: {status: "PENDING"}}, {$group: {_id: "$status", pendingSum: {$sum: 1}}}],
+            dueSum: [{$match: {status: "DUE"}}, {$group: {_id: "$status", dueSum: {$sum: 1}}}],
+            acceptedSum: [{$match: {status: "ACCEPTED"}}, {$group: {_id: "$status", acceptedSum: {$sum: 1}}}],
+            cancelledSum: [{$match: {status: "CANCELLED"}}, {$group: {_id: "$status", cancelledSum: {$sum: 1}}}],
+            rejectedSum: [{$match: {status: "REJECTED"}}, {$group: {_id: "$status", rejectedSum: {$sum: 1}}}]
         }},
-        {$project: {_id: 0, totalSum: "$totalSum.totalSum", statusSum: "$statusSum.statusSum"}},
-        {$unwind: "$totalSum"}, {$unwind: "$statusSum"},
-        {$project: {_id:0, status: "$statusSum._id", ratio: {$divide: ["$statusSum.statusSum", "$totalSum.totalSum"]}}},
-        {$unwind: "$status"},
-        {$group: {_id: null}, ratioApplicationsByStatus: {$push: {status: "$status", ratio: "$ratio"}}}
+        {$project: {
+            _id: 0, 
+            pendingRatio: {$divide: [{$arrayElemAt: ["$pendingSum.pendingSum", 0]}, {$arrayElemAt: ["$totalSum.totalSum", 0]}]},
+            dueRatio: {$divide: [{$arrayElemAt: ["$dueSum.dueSum", 0]}, {$arrayElemAt: ["$totalSum.totalSum", 0]}]},
+            acceptedRatio: {$divide: [{$arrayElemAt: ["$acceptedSum.acceptedSum", 0]}, {$arrayElemAt: ["$totalSum.totalSum", 0]}]},
+            cancelledRatio: {$divide: [{$arrayElemAt: ["$cancelledSum.cancelledSum", 0]}, {$arrayElemAt: ["$totalSum.totalSum", 0]}]},
+            rejectedRatio: {$divide: [{$arrayElemAt: ["$rejectedSum.rejectedSum", 0]}, {$arrayElemAt: ["$totalSum.totalSum", 0]}]}
+        }}
 
     ], function(err, res) {
-        callback(err, res[0].ratioApplicationsByStatus)
+        if (res[0]) {
+            callback(err, res[0].pendingRatio, res[0].dueRatio, res[0].acceptedRatio, res[0].cancelledRatio, res[0].rejectedRatio);
+
+        } else {
+            callback(err, []);
+        }
     });
 };
 
@@ -337,7 +358,11 @@ function computeAvgMinMaxStdTripsPerManager (callback) {
             stdTripsPerManager: {"$stdDevPop": "$tripsPerManager"}
         }}
     ], function(err, res) {
-        callback(err, [res[0].avgTripsPerManager, res[0].minTripsPerManager, res[0].maxTripsPerManager, res[0].stdTripsPerManager])
+        if (res[0]) {
+            callback(err, [res[0].avgTripsPerManager, res[0].minTripsPerManager, res[0].maxTripsPerManager, res[0].stdTripsPerManager]);
+        } else {
+            callback(err, []);
+        }
     });
 };
 
@@ -351,7 +376,12 @@ function computeAvgMinMaxStdTripsPrice (callback) {
             stdTripsPrice: {"$stdDevPop": "$price"}
         }}
     ], function(err, res) {
-        callback(err, [res[0].avgTripsPrice, res[0].minTripsPrice, res[0].maxTripsPrice, res[0].stdTripsPrice])
+        if (res[0]) {
+            callback(err, [res[0].avgTripsPrice, res[0].minTripsPrice, res[0].maxTripsPrice, res[0].stdTripsPrice]);
+
+        } else {
+            callback(err, []);
+        }
     });
 };
 
@@ -360,7 +390,11 @@ function computeAvgPriceRangeFinders (callback) {
         {$group: {_id: 0, avgMinPrice: {"$avg": "$minPrice"}, avgMaxPrice: {"$avg": "$maxPrice"}}},
 
     ], function(err, res) {
-        callback(err, [res[0].avgMinPrice, res[0].avgMaxPrice])
+        if (res[0]) {
+            callback(err, [res[0].avgMinPrice, res[0].avgMaxPrice]);
+        } else {
+            callback(err, []);
+        }
     });
 };
 
@@ -372,6 +406,10 @@ function computeTopFinderKeywords (callback) {
         {$limit: 10}
 
     ], function(err, res) {
-        callback(err, res[0]._id)
+        if (res[0]) {
+            callback(err, res[0]._id);
+        } else {
+            callback(err, []);
+        }
     });
 };
