@@ -21,6 +21,7 @@
   "dependencies": {
     "async": "^3.2.0",
     "bcrypt": "^3.0.8",
+    "complexity-report": "^2.0.0-alpha",
     "cron": "^1.8.2",
     "express": "^4.17.1",
     "firebase-admin": "^8.9.2",
