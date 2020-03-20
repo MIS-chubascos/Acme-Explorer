@@ -479,36 +479,16 @@ async function computeCube () {
 }
 
 function validatePeriod(string) {
-    try {
-        var numbers = Number(string.substring(1,3)); //Syntax for the form M01-M36
-        
-        // Now we have two posibilities: Mxx or Yxx
-        // First months (M)
-        if (string.startsWith("M")) {
-            if (numbers < 1 || numbers > 36) { // Months can be from 1 to 36
-                return false;
-            }
-        
-        // now years (Y)
-        } else if (string.startsWith("Y")) {
-            if (numbers < 1 || numbers > 3) {
-                return false;
-            }
+    return /^M0[1-9]|M1[0-9]|M2[0-9]|M3[0-6]|Y0[1-3]$/.test(string);
+}
 
-        } else { //bad syntax
-            return false;
-        }
-
-        return true;
-
-    } catch(error) { //Probably bad syntax
-        return false;
-    }
+function validateComparator(string) {
+    return /^==|!=|>|>=|<|<=$/.test(string);
 }
 
 exports.getCube = function(req, res) {
 
-    if (validatePeriod(req.query.period) == true) {
+    if (req.query.period && req.query.explorerId && validatePeriod(req.query.period)) {
         Cube.findOne({explorer: req.query.explorerId, period: req.query.period}, function(err, cube) {
             if (err) {
                 res.status(500).send(err);
@@ -527,23 +507,46 @@ exports.getCube = function(req, res) {
 };
 
 exports.getCubeAdvanced = async function (req, res) {
-    const table = new Table({
-        dimensions: ['period', 'explorer'],
-        fields: ['money'],
-      })
-    Cube.find({}, function (err, results) {
-        if (err) {
-            res.send(err);
-        } else {
-            rows = []
-            results.map((row) => {
-                rows.push([row.period, row.explorer, row.money])
-            })
-            const table2 = table.addRows({
-                header: ['period', 'explorer', 'money'],
-                rows: rows
-            })
-            res.json(table2);
-        }
-    })
+
+    if (req.query.period && req.query.comparator && req.query.value && validatePeriod(req.query.period) && validateComparator(req.query.comparator)) {
+        const table = new Table({
+            dimensions: ['period', 'explorer'],
+            fields: ['money'],
+        });
+
+        Cube.find({period: req.query.period}, function (err, results) {
+            if (err) {
+                res.status(500).send(err);
+
+            } else if (!results) {
+                res.status(404).send({message: "No cube found."});
+
+            } else {
+                rows = []
+                results.map((row) => {
+                    rows.push([row.period, row.explorer, row.money])
+                });
+
+                const table2 = table.addRows({
+                    header: ['period', 'explorer', 'money'],
+                    rows: rows
+                });
+
+                explorers = table2.rows
+                    .filter(row => eval(row[2] + req.query.comparator + req.query.value))
+                    .flatMap(row => {
+                        return {
+                            period: row[0],
+                            explorer: row[1],
+                            money: row[2]
+                        }
+                    });
+
+                res.json(explorers);
+            }
+        });
+
+    } else {
+        res.status(422).send({message: "Invalid period format."})
+    }
 }
