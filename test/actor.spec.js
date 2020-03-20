@@ -63,12 +63,12 @@ describe("Actor class test", () =>{
 
             
         it("Put an actor", done => {
-            var actor = {"name":"Johnnie", "surname":"Doerson", "email":"john@mail.com", "phoneNumber":"987654320", "address":"over here","password":"pw0rde","actorType":["ADMINISTRATOR","EXPLORER"]}
+           var actor = {"name":"Johny", "surname":"Doe", "email":"hjn@mil.com", "phoneNumber":"987654321", "address":"there","password":"pw0rd","banned":false,"actorType":["ADMINISTRATOR","EXPLORER"]}
             chai
             .request(app)
             .put("/api/v1/actors/${actor._id}")
             .send(actor)
-            .end((err,res) =>{
+            .end((err, res)=>{
                 expect(res).to.have.status(200);
                 expect("Content-Type", /json/);
                 if(err) done(err);

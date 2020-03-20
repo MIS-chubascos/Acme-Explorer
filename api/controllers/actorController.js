@@ -100,19 +100,13 @@ exports.readAnActor = function (req, res) {
     });
 };
 
-//This method updates the profile. For banning an actor, use ban/unban
-//Email can't be updated considering that is the account's loggin method (?)
+//This method updates the profile
 exports.updateAnActor = function (req, res) {
     Actor.findById(req.params.actorId, function (err, actor) {
-        if (err || !actor) {
+        if (err /*|| !actor*/) {
             res.status(500).send(err);
         } else {
-            Actor.findOneAndUpdate({ _id: req.params.actorId }, 
-                {name: req.body.name, 
-                    surname: req.body.surname, 
-                    phoneNumber: req.body.phoneNumber, 
-                    address: req.body.address, 
-                    password: req.body.password},
+            Actor.findOneAndUpdate({ _id: req.params.actorId }, req.body,
                 {new: true,
                     upsert: true,
                     setDefaultsOnInsert: true,
