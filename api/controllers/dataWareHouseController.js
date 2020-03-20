@@ -3,12 +3,14 @@ var mongoose = require("mongoose"),
     DataWareHouse = mongoose.model("DataWareHouse"),
     TripApplication = mongoose.model("TripApplications");
     Trip = mongoose.model("Trip");
+    Cube = mongoose.model("Cube");
     Actor = mongoose.model("Actors");
     Finder = mongoose.model('Finders');
     Sponsorship = mongoose.model('Sponsorships');
     Configuration = mongoose.model('Config')
 var Utils = require('../utils');
 const dummy = require('mongoose-dummy');
+const Table = require('olap-cube').model.Table;
 
 exports.listAllIndicators = function(req, res) {
     console.log("Requesting indicators");
@@ -125,8 +127,11 @@ exports.populate = function (req, res) {
         var trip = dummies['trips'][Math.floor(Math.random() * req.query.size) % dummies['trips'].length];
 
         dummyTripApplication._id = new mongoose.Types.ObjectId();
-        dummyTripApplication.status = 'PENDING';
+        dummyTripApplication.status = 'ACCEPTED';
         dummyTripApplication.trip = trip['_id'];
+        var d = new Date();
+        d.setDate(d.getDate()-40);
+        dummyTripApplication.paidDate = d;
         dummyTripApplication.manager = trip['manager'];
         dummyTripApplication.explorer = dummies['explorers'][Math.floor(Math.random() * req.query.size)]['_id'];
         dummies['tripApplications'].push(dummyTripApplication)
@@ -413,3 +418,84 @@ function computeTopFinderKeywords (callback) {
         }
     });
 };
+
+exports.computeCube = async function (req, res) {
+    tripAppsByPeriod = []
+
+    // Months
+    for (var i = 1; i < 37; i++) {
+        period = "M"
+        if (i < 10) {
+            period += "0" + i;
+
+        } else {
+            period += i;
+        }
+        var initialDate = new Date();
+        initialDate.setMonth(initialDate.getMonth - i);
+
+        tripAppsByPeriod.push(TripApplication.aggregate([
+            {$match: {status: "ACCEPTED", paidDate: {$gte: initialDate}}},
+            {$group: {_id: "$explorer", trips: {$push: "$trip"}}},
+            {$project: {_id: "$_id", trips: "$trips", period: period}}
+        ]).exec());
+    }
+
+    // Years
+    for (var i = 1; i < 4; i++) {
+        period = "Y0" + i
+    
+        var initialDate = new Date();
+        initialDate.setMonth(initialDate.getFullYear - i);
+
+        tripAppsByPeriod.push(TripApplication.aggregate([
+            {$match: {status: "ACCEPTED", paidDate: {$gte: initialDate}}},
+            {$group: {_id: "$explorer", trips: {$push: "$trip"}}},
+            {$project: {_id: "$_id", trips: "$trips", period: period}}
+        ]).exec());
+    }
+
+    // Solve promises
+    Promise.all(tripAppsByPeriod).then((obtainedTripAppsByPeriod) => { // All the applications for every month [{explorer, trips, period}]
+        var tripsByTripApps = []
+        obtainedTripAppsByPeriod.map((tripApplications, index) => {  // All the applications for one month [{explorer, trips}]
+            tripApplications.map((tripApplication) => { // {explorer, trips}
+                tripsByTripApps.push(Trip.aggregate([
+                    {$match: {_id: {$in: tripApplication.trips}}},
+                    {$group: {_id: tripApplication._id, money: {$sum: "$price"}}},
+                    {$project: {_id: tripApplication._id, money: "$money", period: tripApplication.period}}
+                ]).exec())
+            });
+            Promise.all(tripsByTripApps).then((result) => {
+                result.map((res) => {
+                    var cube = new Cube({"explorer": res[0]._id, "money": res[0].money, "period": res[0].period})
+                    cube.save(function(err, cube) {
+                    });
+                })
+            });
+        });
+    });
+}
+
+exports.getCube = async function (req, res) {
+    const table = new Table({
+        dimensions: ['period', 'explorer'],
+        fields: ['money'],
+      })
+    Cube.find({}, function (err, results) {
+        if (err) {
+            res.send(err);
+        } else {
+            rows = []
+            results.map((row) => {
+                rows.push([row.period, row.explorer, row.money])
+            })
+            const table2 = table.addRows({
+                header: ['period', 'explorer', 'money'],
+                rows: rows
+            })
+            res.json(table2);
+        }
+    })
+}
+
