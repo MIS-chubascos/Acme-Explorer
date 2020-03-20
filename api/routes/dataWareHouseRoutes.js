@@ -34,6 +34,12 @@ module.exports = function(app) {
 	app.route(V1_API_PATH + '/populate')
 		.get(dataWareHouse.populate);
 
+	app.route(V1_API_PATH + '/dataWareHouse/cube')
+		.get(dataWareHouse.getCube);
+
+	app.route(V1_API_PATH + '/dataWareHouse/cubeAdvanced')
+		.get(dataWareHouse.getCubeAdvanced);
+
 	// V2 methods
 
 	app.route(V2_API_PATH + '/dataWareHouse')
@@ -43,16 +49,10 @@ module.exports = function(app) {
 	app.route(V2_API_PATH + '/dataWareHouse/latest')
 		.get(authController.verifyUser(['ADMINISTRATOR']), dataWareHouse.lastIndicator);
 
-	// CUBO: THE FAILS BEGINS
-	app.route(V1_API_PATH + '/dataWareHouse/cube')
-		.get(dataWareHouse.computeCube)
-	app.route(V1_API_PATH + '/dataWareHouse/readCube')
-		.get(dataWareHouse.getCube)
-		
 	app.route(V2_API_PATH + '/dataWareHouse/cube')
-        .get(authController.verifyUser(['ADMINISTRATOR']), dataWareHouse.computeCube)
+		.get(authController.verifyUser(['ADMINISTRATOR']), dataWareHouse.getCube);
 
-    // app.route(V2_API_PATH + '/dataWareHouse/cube')
-    //     .get(authController.verifyUser(['ADMINISTRATOR']), dataWareHouse.getCube)
+	app.route(V1_API_PATH + '/dataWareHouse/cubeAdvanced')
+		.get(authController.verifyUser(['ADMINISTRATOR']), dataWareHouse.getCubeAdvanced);
 
 };

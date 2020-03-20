@@ -1,13 +1,13 @@
 var async = require("async");
 var mongoose = require("mongoose"),
     DataWareHouse = mongoose.model("DataWareHouse"),
-    TripApplication = mongoose.model("TripApplications");
-    Trip = mongoose.model("Trip");
-    Cube = mongoose.model("Cube");
-    Actor = mongoose.model("Actors");
-    Finder = mongoose.model('Finders');
-    Sponsorship = mongoose.model('Sponsorships');
-    Configuration = mongoose.model('Config')
+    TripApplication = mongoose.model("TripApplications"),
+    Trip = mongoose.model("Trip"),
+    Cube = mongoose.model("Cube"),
+    Actor = mongoose.model("Actors"),
+    Finder = mongoose.model('Finders'),
+    Sponsorship = mongoose.model('Sponsorships'),
+    Configuration = mongoose.model('Config');
 var Utils = require('../utils');
 const dummy = require('mongoose-dummy');
 const Table = require('olap-cube').model.Table;
@@ -274,7 +274,8 @@ function createDataWareHouseJob() {
             computeAvgMinMaxStdTripsPerManager,
             computeAvgMinMaxStdTripsPrice,
             computeAvgPriceRangeFinders,
-            computeTopFinderKeywords
+            computeTopFinderKeywords,
+            computeCube
 
         ], function(err, results) {
             if (err) {
@@ -419,7 +420,7 @@ function computeTopFinderKeywords (callback) {
     });
 };
 
-exports.computeCube = async function (req, res) {
+async function computeCube () {
     tripAppsByPeriod = []
 
     // Months
@@ -477,7 +478,55 @@ exports.computeCube = async function (req, res) {
     });
 }
 
-exports.getCube = async function (req, res) {
+function validatePeriod(string) {
+    try {
+        var numbers = Number(string.substring(1,3)); //Syntax for the form M01-M36
+        
+        // Now we have two posibilities: Mxx or Yxx
+        // First months (M)
+        if (string.startsWith("M")) {
+            if (numbers < 1 || numbers > 36) { // Months can be from 1 to 36
+                return false;
+            }
+        
+        // now years (Y)
+        } else if (string.startsWith("Y")) {
+            if (numbers < 1 || numbers > 3) {
+                return false;
+            }
+
+        } else { //bad syntax
+            return false;
+        }
+
+        return true;
+
+    } catch(error) { //Probably bad syntax
+        return false;
+    }
+}
+
+exports.getCube = function(req, res) {
+
+    if (validatePeriod(req.query.period) == true) {
+        Cube.findOne({explorer: req.query.explorerId, period: req.query.period}, function(err, cube) {
+            if (err) {
+                res.status(500).send(err);
+    
+            } else if (!cube) {
+                res.status(404).send({message: "No data found for the given params."});
+            
+            } else {
+                res.json(cube);
+            }
+        });
+
+    } else {
+        res.status(422).send({message: "Invalid period format."})
+    }
+};
+
+exports.getCubeAdvanced = async function (req, res) {
     const table = new Table({
         dimensions: ['period', 'explorer'],
         fields: ['money'],
@@ -498,4 +547,3 @@ exports.getCube = async function (req, res) {
         }
     })
 }
-
