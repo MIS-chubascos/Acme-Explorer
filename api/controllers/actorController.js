@@ -217,9 +217,6 @@ exports.deleteAnActorV2 = async function (req, res) {
         if(actorForErase.actorType.includes('EXPLORER')){
             finderController.deleteFinder(actorForErase.actorId)
         }
-        else{
-            break;
-        }
     }
     Actor.remove({
             _id: req.params.actorId
