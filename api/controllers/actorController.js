@@ -91,8 +91,10 @@ exports.createAnActorVerified = async function(req, res){
 
 exports.readAnActor = function (req, res) {
     Actor.findById(req.params.actorId, function (err, actor) {
-        if (err || !actor) {
+        if (err) {
             res.send(err);
+        } else if (!actor) {
+            res.status(404).send({message: "No actor found for the given ID"});
         }
         else {
             res.json(actor);

@@ -24,8 +24,10 @@ exports.createSponsorship = async function(req,res){
 
 exports.getSponsorshipV1 = function(req,res){
     Sponsorship.findById(req.params.sponsorshipId, function(err, sponsorship){
-        if(err || sponsorship == null){
+        if(err){
             res.status(500).send("Error finding sponsorship with id " + String(req.params.sponsorshipId));
+        } else if (!sponsorship) {
+            res.status(404).send("Sponsorship with id " + String(req.params.sponsorshipId) + " not found");
         }else{
             res.json(sponsorship);
         }
@@ -52,8 +54,10 @@ exports.getSponsorshipV2 = async function(req,res){
 
 exports.deleteSponsorshipV1 = async function (req, res) {
     Sponsorship.findById(req.params.sponsorshipId, function (err, sponsorship) {
-        if (err || sponsorship == null) {
+        if (err) {
             res.send("Error finding sponsorship with id " + String(req.params.sponsorshipId));
+        } else if (!sponsorship) {
+            res.status(404).send("Sponsorship with id " + String(req.params.sponsorshipId) + " not found");
         } else {
             Sponsorship.findOneAndDelete({ _id: req.params.sponsorshipId }, function (err, sponsorship) {
                 if (err || sponsorship == null) {
@@ -92,8 +96,10 @@ exports.deleteSponsorshipV2 = async function (req, res) {
 
 exports.updateSponsorshipV1 = async function(req,res){
     Sponsorship.findOneAndUpdate({_id: req.params.sponsorshipId}, req.body, {new:true}, function(err,sponsorship){
-        if(err || sponsorship == null){
+        if(err){
             res.status(500).send("Error finding sponsorship with id " + String(req.params.sponsorshipId));
+        } else if (!sponsorship) {
+            res.status(404).send("Sponsorship with id " + String(req.params.sponsorshipId) + " not found");
         }else{
             res.json(sponsorship);
         }
@@ -123,6 +129,8 @@ exports.getTripRandomSponsorship = function(req,res){
     Sponsorship.find({ "trip": tripId, "payed": true }, function(err, sponsorships){
         if(err){
             res.status(500).send(err);
+        } else if (!sponsorships || sponsorships.length == 0) {
+            res.status(404).send("Sponsorships for trip with id " + String(tripId) + " not found");
         }else{
             var sponsorship = sponsorships[Math.floor(Math.random() * sponsorships.length)]
             res.json({ "banner": sponsorship.banner, "url": sponsorship.url });
