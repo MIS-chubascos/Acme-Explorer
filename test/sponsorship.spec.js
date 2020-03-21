@@ -3,7 +3,8 @@ const chai = require("chai");
 const chaiHttp = require("chai-http");
 var mongoose = require('mongoose'),
   Sponsorship = mongoose.model('Sponsorships'),
-  Actor = mongoose.model('Actors');
+  Actor = mongoose.model('Actors'),
+  Trip = mongoose.model('Trip');
 
 const { expect } = chai;
 chai.use(chaiHttp);

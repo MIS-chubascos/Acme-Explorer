@@ -52,7 +52,7 @@ describe("Actor class test", () =>{
         it("Get an actor", done => {
             chai
             .request(app)
-            .get("/api/v1/actors/${actor._id}")
+            .get(`/api/v1/actors/${actor._id}`)
             .end((err, res)=>{
                 expect(res).to.have.status(200);
                 expect("Content-Type", /json/);
