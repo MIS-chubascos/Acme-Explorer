@@ -43,13 +43,5 @@ module.exports = function (app) {
         .get(authController.verifyUser(['MANAGER']), actors.getManagerTripsV2) 
 
     app.route(V2_API_PATH + '/actors/:actorId/sponsorships')
-        .get(authController.verifyUser(['SPONSOR']), actors.getSponsorSponsorshipsV2)                               
-
-    //given an explorer and a period, return the result of query. check 'sumPrice' atribute 
-    app.route(V1_API_PATH +'/actors/cubeDataMoney/:explorer/:period')
-        .get(actors.cubeDataMoney)
-
-    // get all M[p,e] > V    need ask period, ammount and comparator 
-    app.route(V1_API_PATH +'/actors/cubeDataComparator/:period/:ammount/:comparator')
-        .get(actors.cubeDataComparator)
-    };
+        .get(authController.verifyUser(['SPONSOR']), actors.getSponsorSponsorshipsV2);
+}
