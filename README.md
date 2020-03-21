@@ -34,3 +34,28 @@ In short terms, this package makes you able to hash the user's password generati
 In cryptography, a salt is random data that is used as an additional input to a one-way function that hashes data.
 
 Checkout actorModel at line 48 and below.
+
+## Advanced use of promises [ A+ ]
+
+To develop the cube requirement, we have made use of  *promises*. This is a hightlight
+of the entire implementation, that can be found in the file `api/controllers/dataWareHouseController.js`:
+
+```javascript
+Promise.all(tripAppsByPeriod).then((obtainedTripAppsByPeriod) => { 
+        var tripsByTripApps = []
+        obtainedTripAppsByPeriod.map((tripApplications, index) => { 
+            tripApplications.map((tripApplication) => { 
+                tripsByTripApps.push(Trip.aggregate([
+                    {$match: {_id: {$in: tripApplication.trips}}},
+                    {$group: {_id: tripApplication._id, money: {$sum: "$price"}}},
+                    {$project: {_id: tripApplication._id, money: "$money", period: tripApplication.period}}
+                ]).exec())
+            });
+            Promise.all(tripsByTripApps).then((result) => {
+                result.map((res) => {
+                    ...
+                })
+            });
+        });
+    });
+```
