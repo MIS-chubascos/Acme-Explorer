@@ -1,9 +1,0 @@
-{
-    "fields": {
-        "email": "Correo electrónico",
-        "password": "Contraseña"
-    }, 
-    "buttons": {
-        "login": "Entrar"
-    }
-}

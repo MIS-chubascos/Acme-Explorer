@@ -1,9 +1,0 @@
-{
-    "fields": {
-        "email": "Email",
-        "password": "Password"
-    }, 
-    "buttons": {
-        "login": "Login"
-    }
-}
