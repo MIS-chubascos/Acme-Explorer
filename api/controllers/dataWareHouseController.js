@@ -250,7 +250,7 @@ var CronTime = require("cron").CronTime;
 // '*/30 * * * * *' cada 30 segundos
 // '*/10 * * * * *' cada 10 segundos
 // '* * * * * *' cada segundo
-var rebuildPeriod = '*/10 * * * * *'; // El que se usará por defecto
+var rebuildPeriod = '* */5 * * * *'; // El que se usará por defecto
 var computeDataWareHouseJob;
 
 exports.rebuildPeriod = function(req, res) {
@@ -469,9 +469,18 @@ async function computeCube () {
             });
             Promise.all(tripsByTripApps).then((result) => {
                 result.map((res) => {
-                    var cube = new Cube({"explorer": res[0]._id, "money": res[0].money, "period": res[0].period})
-                    cube.save(function(err, cube) {
-                    });
+                    var cube_data = {"explorer": res[0]._id, "money": res[0].money, "period": res[0].period}
+                    Cube.find({"explorer": res[0]._id, "period": res[0].period}, function(err, cube) {
+                        if (cube.length <= 0){
+                            var new_cube = new Cube(cube_data)
+                            new_cube.save(function(err, cube) {
+                            });
+                        } else if (cube[0].money != res[0].money) {
+                            cube[0].money = res[0].money;
+                            cube[0].save(function(err, cube) {
+                            });
+                        }
+                    })
                 })
             });
         });
