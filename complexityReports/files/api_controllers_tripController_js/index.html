@@ -44,11 +44,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
-      <p class="stat">66.52</p>
+      <p class="stat">66.12</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
-      <p class="stat">333</p>
+      <p class="stat">339</p>
     </div>
   </div>
   <div class="row historical">
@@ -62,11 +62,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
-      <p class="stat">78.58</p>
+      <p class="stat">78.52</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
-      <p class="stat">3.61</p>
+      <p class="stat">3.70</p>
     </div>
   </div>
 </div>
@@ -116,8 +116,10 @@ exports.getAllTrips = function (req, res) {
 
 exports.getTripV1 = function (req, res) {
     Trip.findById(req.params.tripId, function (err, trip) {
-        if (err || trip == null) {
-            res.send(&quot;Error finding trip with id &quot; + String(req.params.tripId));
+        if (err) {
+            res.send(err);
+        } else if (!trip) {
+            res.status(404).send(&quot;Trip with id &quot; + String(req.params.tripId) + &quot; not found&quot;);
         } else {
             res.json(trip);
         }
@@ -160,8 +162,10 @@ exports.createTrip = async function (req, res) {
 
 exports.updateTripV1 = function (req, res) {
     Trip.findById(req.params.tripId, function (err, trip) {
-        if (err || trip == null) {
-            res.send(&quot;Error finding trip with id &quot; + String(req.params.tripId));
+        if (err) {
+            res.send(err);
+        } else if (!trip) {
+            res.status(404).send(&quot;Trip with id &quot; + String(req.params.tripId) + &quot; not found&quot;);
         } else if (trip.publicationDate &lt;= new Date() ) {
             res.status(403);
             res.json({message: &#039;Forbidden. The trip is already published.&#039;, error: err});
@@ -367,8 +371,10 @@ exports.createTripApplicationV2 = async function (req, res) {
 // Other methods
 exports.cancelTripV1 = async function (req, res) {
     Trip.findById(req.params.tripId, function (err, trip) {
-        if (err || trip == null) {
-            res.send(&quot;Error finding trip with id &quot; + String(req.params.tripId));
+        if (err) {
+            res.send(err);
+        } else if (!trip) {
+            res.status(404).send(&quot;Trip with id &quot; + String(req.params.tripId) + &quot; not found&quot;);
         } else if (trip.startDate &lt;= new Date() 
             || tripApplicationController.getAcceptedTripApplications(req.params.tripId) &lt;= 0) { 
             res.json({message: &#039;Forbidden. The trip has started or has accepted applications.&#039;,error: err});
