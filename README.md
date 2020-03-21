@@ -12,3 +12,13 @@ To populate the database, do `GET /populate?size={size}`, where *size* is the nu
 for every model. For example, `/populate?size=1` would create one manager, one trip, one tripApplication and so on.
 
 This feature has been implemented thanks to *mongoose-dummy* library.
+
+## Generate complexity reports for the controllers [ A+ ]
+
+To generate the reports, open the terminal and execute the following commands:
+* `npm install -g plato`
+* `plato -r -d complexityReports api/controllers`
+
+This will generate an *html* report that you can find in the folder *complexityReports*.
+
+This feature has been implemented thanks to *plato* library.
