@@ -72,6 +72,7 @@ var CubeSchema = new mongoose.Schema({
 
 }, {strict: false});
 
+CubeSchema.index({ explorer: 1, period: 1, money: 1 }, {unique:true});
 DataWareHouseSchema.index({computationMoment: -1});
 
 module.exports = mongoose.model('DataWareHouse', DataWareHouseSchema);
