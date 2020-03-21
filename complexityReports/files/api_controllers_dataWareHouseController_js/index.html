@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - api\controllers\dataWareHouseController.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>api\controllers\dataWareHouseController.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">61.27</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">552</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">59.22</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">7.54</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">var async = require(&quot;async&quot;);
+var mongoose = require(&quot;mongoose&quot;),
+    DataWareHouse = mongoose.model(&quot;DataWareHouse&quot;),
+    TripApplication = mongoose.model(&quot;TripApplications&quot;),
+    Trip = mongoose.model(&quot;Trip&quot;),
+    Cube = mongoose.model(&quot;Cube&quot;),
+    Actor = mongoose.model(&quot;Actors&quot;),
+    Finder = mongoose.model(&#039;Finders&#039;),
+    Sponsorship = mongoose.model(&#039;Sponsorships&#039;),
+    Configuration = mongoose.model(&#039;Config&#039;);
+var Utils = require(&#039;../utils&#039;);
+const dummy = require(&#039;mongoose-dummy&#039;);
+const Table = require(&#039;olap-cube&#039;).model.Table;
+
+exports.listAllIndicators = function(req, res) {
+    console.log(&quot;Requesting indicators&quot;);
+
+    DataWareHouse.find().sort(&quot;-computationMoment&quot;).exec(function(err, indicators) {
+        if (err) {
+            res.status(500).send(err);
+
+        } else {
+            res.json(indicators);
+        }
+    });
+};
+
+exports.lastIndicator = function(req, res) {
+    DataWareHouse.find().sort(&quot;-computationMoment&quot;).limit(1).exec(function(err, indicator) {
+        if (err) {
+            res.status(500).send(err);
+
+        } else {
+            res.json(indicator);
+        }
+    });
+};
+
+exports.populate = function (req, res) {
+    var dummies = {}
+    dummies[&#039;trips&#039;] = []
+    dummies[&#039;managers&#039;] = []
+    dummies[&#039;finders&#039;] = []
+    dummies[&#039;explorers&#039;] = []
+    dummies[&#039;sponsors&#039;] = [] 
+    dummies[&#039;sponsorships&#039;] = [] 
+    dummies[&#039;tripApplications&#039;] = []
+    dummies[&#039;administrators&#039;] = []
+    dummies[&#039;configuration&#039;] = []
+
+    // Managers
+
+    for(var i = 0; i &lt; req.query.size; i++){
+        let dummyManager = dummy(Actor, {
+            ignore: [&#039;actorType&#039;, &#039;banned&#039;, &#039;_id&#039;, &#039;__v&#039;],
+            returnDate: true
+        })
+
+        dummyManager._id = new mongoose.Types.ObjectId();
+        dummyManager.actorType = [&#039;MANAGER&#039;];
+        dummyManager.__v = 0;
+        dummies[&#039;managers&#039;].push(dummyManager)
+    }
+
+    // Trips
+
+    for(var i = 0; i &lt; req.query.size; i++){
+        let dummyTrip = dummy(Trip, {
+            ignore: [&#039;pictures&#039;, &#039;cancelReason&#039;, &#039;ticker&#039;, &#039;manager&#039;, &#039;_id&#039;, &#039;__v&#039;],
+            returnDate: true
+        })
+
+        dummyTrip._id = new mongoose.Types.ObjectId();
+        dummyTrip.manager = dummies[&#039;managers&#039;][Math.floor(Math.random() * req.query.size)][&#039;_id&#039;];
+        dummyTrip.ticker = Utils.generateTicker(dummyTrip.startDate);
+        dummyTrip.cancelReason = [];
+        dummyTrip.endDate.setDate(dummyTrip.startDate.getDate() + 5);
+        dummyTrip.publicationDate.setDate(dummyTrip.startDate.getDate() - 3);
+        dummyTrip.__v = 0;
+
+        totalPrice = 0
+        for (var j = 0; j &lt; dummyTrip.stages.length; j++) {
+            dummyTrip.stages[j].order = j;
+            totalPrice += dummyTrip.stages[j].price;
+        }
+        dummyTrip.price = totalPrice;
+        dummies[&#039;trips&#039;].push(dummyTrip)
+    }
+
+    // Explorers
+
+    for(var i = 0; i &lt; req.query.size; i++) {
+        let dummyExplorer = dummy(Actor, {
+            ignore: [&#039;actorType&#039;, &#039;banned&#039;, &#039;_id&#039;, &#039;__v&#039;],
+            returnDate: true
+        })
+
+        dummyExplorer._id = new mongoose.Types.ObjectId();
+        dummyExplorer.actorType = [&#039;EXPLORER&#039;];
+        dummyExplorer.__v = 0;
+        dummies[&#039;explorers&#039;].push(dummyExplorer)
+    }    
+
+    // Finders
+
+    for(var i = 0; i &lt; req.query.size; i++) {
+        let dummyFinder = dummy(Finder, {
+            ignore: [&#039;_id&#039;, &#039;__v&#039;],
+            returnDate: true
+        })
+
+        dummyFinder._id = new mongoose.Types.ObjectId();
+        dummyFinder.maxPrice = dummyFinder.minPrice + 500;
+        dummyFinder.endDate.setDate(dummyFinder.startDate.getDate() + 14);
+        dummyFinder.explorer = dummies[&#039;explorers&#039;][Math.floor(Math.random() * req.query.size)][&#039;_id&#039;];
+        dummies[&#039;finders&#039;].push(dummyFinder)
+    }
+
+    // TripApplications
+
+    for(var i = 0; i &lt; req.query.size; i++) {
+        let dummyTripApplication = dummy(TripApplication, {
+            ignore: [&#039;moment&#039;, &#039;status&#039;, &#039;paidDate&#039;, &#039;_id&#039;, &#039;rejectedReason&#039;, &#039;__v&#039;],
+            returnDate: true
+        })
+
+        var trip = dummies[&#039;trips&#039;][Math.floor(Math.random() * req.query.size) % dummies[&#039;trips&#039;].length];
+
+        dummyTripApplication._id = new mongoose.Types.ObjectId();
+        dummyTripApplication.status = &#039;ACCEPTED&#039;;
+        dummyTripApplication.trip = trip[&#039;_id&#039;];
+        var d = new Date();
+        d.setDate(d.getDate()-40);
+        dummyTripApplication.paidDate = d;
+        dummyTripApplication.manager = trip[&#039;manager&#039;];
+        dummyTripApplication.explorer = dummies[&#039;explorers&#039;][Math.floor(Math.random() * req.query.size)][&#039;_id&#039;];
+        dummies[&#039;tripApplications&#039;].push(dummyTripApplication)
+    }
+
+    // Sponsors
+
+    for(var i = 0; i &lt; req.query.size; i++) {
+        let dummySponsor = dummy(Actor, {
+            ignore: [&#039;actorType&#039;, &#039;banned&#039;, &#039;_id&#039;, &#039;__v&#039;],
+            returnDate: true
+        })
+
+        dummySponsor._id = new mongoose.Types.ObjectId();
+        dummySponsor.actorType = [&#039;SPONSOR&#039;];
+        dummySponsor.__v = 0;
+        dummies[&#039;sponsors&#039;].push(dummySponsor)
+    }   
+
+    // Sponsorships
+
+    for(var i = 0; i &lt; req.query.size; i++){
+        let dummySponsorship = dummy(Sponsorship, {
+            ignore: [&#039;banner&#039;, &#039;sponsor&#039;, &#039;trip&#039;, &#039;payed&#039;],
+            returnDate: true
+        })
+
+        dummySponsorship._id = new mongoose.Types.ObjectId();
+        dummySponsorship.sponsor = dummies[&#039;sponsors&#039;][Math.floor(Math.random() * req.query.size)][&#039;_id&#039;];
+        dummySponsorship.trip = dummies[&#039;trips&#039;][Math.floor(Math.random() * req.query.size) % dummies[&#039;trips&#039;].length][&#039;_id&#039;];
+        dummySponsorship.__v = 0;
+        dummies[&#039;sponsorships&#039;].push(dummySponsorship)
+    }
+
+    // Admins
+
+    for(var i = 0; i &lt; req.query.size; i++){
+        let dummyAdministrator = dummy(Actor, {
+            ignore: [&#039;actorType&#039;, &#039;banned&#039;, &#039;_id&#039;, &#039;__v&#039;],
+            returnDate: true
+        })
+
+        dummyAdministrator._id = new mongoose.Types.ObjectId();
+        dummyAdministrator.actorType = [&#039;ADMINISTRATOR&#039;];
+        dummyAdministrator.__v = 0;
+        dummies[&#039;administrators&#039;].push(dummyAdministrator)
+    }
+
+    //Configuration (just 1)
+
+    let dummyConfiguration = dummy(Configuration, {
+        ignore: [&#039;_id&#039;,&#039;flatRate&#039;,&#039;finderMaxResults&#039;,&#039;finderCacheTime&#039;],
+        returnDate: true
+    })
+
+    dummyConfiguration._id = new mongoose.Types.ObjectId();
+    dummyConfiguration.__v = 0;
+    dummyConfiguration.flatRate = 2;
+    dummyConfiguration.finderMaxResult = 5;
+    dummyConfiguration.finderCacheTime = 1;
+    dummies[&#039;configuration&#039;].push(dummyConfiguration);
+
+
+    Actor.collection.insert(dummies[&#039;managers&#039;], function (err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    Trip.collection.insert(dummies[&#039;trips&#039;], function (err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    Actor.collection.insert(dummies[&#039;explorers&#039;], function(err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    Finder.collection.insert(dummies[&#039;finders&#039;], function(err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    TripApplication.collection.insert(dummies[&#039;tripApplications&#039;], function(err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    Actor.collection.insert(dummies[&#039;sponsors&#039;], function(err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    Sponsorship.collection.insert(dummies[&#039;sponsorships&#039;], function(err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    Actor.collection.insert(dummies[&#039;administrators&#039;], function (err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    Configuration.collection.insert(dummies[&#039;configuration&#039;], function (err, docs) {
+        if (err) {
+            return console.error(err);
+        }
+    })
+    res.json(dummies);
+}
+
+var CronJob = require(&quot;cron&quot;).CronJob;
+var CronTime = require(&quot;cron&quot;).CronTime;
+
+// &#039;0 0 * * * *&#039; una hora
+// &#039;*/30 * * * * *&#039; cada 30 segundos
+// &#039;*/10 * * * * *&#039; cada 10 segundos
+// &#039;* * * * * *&#039; cada segundo
+var rebuildPeriod = &#039;*/10 * * * * *&#039;; // El que se usará por defecto
+var computeDataWareHouseJob;
+
+exports.rebuildPeriod = function(req, res) {
+    console.log(&quot;Updating rebuild period. Request: period: &quot; + req.query.rebuildPeriod);
+    
+    rebuildPeriod = req.query.rebuildPeriod;
+    computeDataWareHouseJob.setTime(new CronTime(rebuildPeriod));
+    computeDataWareHouseJob.start();
+
+    res.json(req.query.rebuildPeriod);
+};
+
+function createDataWareHouseJob() {
+    computeDataWareHouseJob = new CronJob(rebuildPeriod, function() {
+        var newDataWareHouse = new DataWareHouse();
+        console.log(&quot;Cron job submitted. Rebuild period: &quot; + rebuildPeriod);
+
+        async.parallel([
+            computeAvgMinMaxStdApplicationsPerTrip,
+            computeRatioApplicationsByStatus,
+            computeAvgMinMaxStdTripsPerManager,
+            computeAvgMinMaxStdTripsPrice,
+            computeAvgPriceRangeFinders,
+            computeTopFinderKeywords,
+            computeCube
+
+        ], function(err, results) {
+            if (err) {
+                console.log(&quot;Error computing datawarehouse: &quot; + err);
+
+            } else {
+                newDataWareHouse.avgMinMaxStdApplicationsPerTrip = results[0];
+                newDataWareHouse.ratioApplicationsByStatus = results[1];
+                newDataWareHouse.avgMinMaxStdTripsPerManager = results[2];
+                newDataWareHouse.avgMinMaxStdTripsPrice = results[3];
+                newDataWareHouse.avgPriceRangeFinders = results[4];
+                newDataWareHouse.topFinderKeywords = results[5];
+
+                newDataWareHouse.save(function(err, datawarehouse) {
+                    if (err) {
+                        console.log(&quot;Error saving datawarehouse: &quot; + err);
+
+                    } else {
+                        console.log(&quot;New datawarehouse successfully saved. Date: &quot; + new Date());
+                    }
+                });
+            }
+        });
+    }, null, true, &#039;Europe/Madrid&#039;);
+}
+
+module.exports.createDataWareHouseJob = createDataWareHouseJob;
+
+function computeAvgMinMaxStdApplicationsPerTrip (callback) {
+    TripApplication.aggregate([
+        {$group: {_id: &quot;$trip&quot;, applications: {$sum: 1}}},
+        {$group: {
+            _id: 0, 
+            avgApplicationsPerTrip: {&quot;$avg&quot;: &quot;$applications&quot;},
+            minApplicationsPerTrip: {&quot;$min&quot;: &quot;$applications&quot;},
+            maxApplicationsPerTrip: {&quot;$max&quot;: &quot;$applications&quot;},
+            stdApplicationsPerTrip: {&quot;$stdDevPop&quot;: &quot;$applications&quot;}
+        }}
+    ], function(err, res) {
+        if (res[0]) {
+            callback(err, [res[0].avgApplicationsPerTrip, res[0].minApplicationsPerTrip, res[0].maxApplicationsPerTrip, res[0].stdApplicationsPerTrip]);
+
+        } else {
+            callback(err, []);
+        }
+    });
+};
+
+function computeRatioApplicationsByStatus (callback) {
+    TripApplication.aggregate([
+        {$facet: {
+            totalSum: [{$group: {_id: null, totalSum: {$sum: 1}}}],
+            pendingSum: [{$match: {status: &quot;PENDING&quot;}}, {$group: {_id: &quot;$status&quot;, pendingSum: {$sum: 1}}}],
+            dueSum: [{$match: {status: &quot;DUE&quot;}}, {$group: {_id: &quot;$status&quot;, dueSum: {$sum: 1}}}],
+            acceptedSum: [{$match: {status: &quot;ACCEPTED&quot;}}, {$group: {_id: &quot;$status&quot;, acceptedSum: {$sum: 1}}}],
+            cancelledSum: [{$match: {status: &quot;CANCELLED&quot;}}, {$group: {_id: &quot;$status&quot;, cancelledSum: {$sum: 1}}}],
+            rejectedSum: [{$match: {status: &quot;REJECTED&quot;}}, {$group: {_id: &quot;$status&quot;, rejectedSum: {$sum: 1}}}]
+        }},
+        {$project: {
+            _id: 0, 
+            pendingRatio: {$divide: [{$arrayElemAt: [&quot;$pendingSum.pendingSum&quot;, 0]}, {$arrayElemAt: [&quot;$totalSum.totalSum&quot;, 0]}]},
+            dueRatio: {$divide: [{$arrayElemAt: [&quot;$dueSum.dueSum&quot;, 0]}, {$arrayElemAt: [&quot;$totalSum.totalSum&quot;, 0]}]},
+            acceptedRatio: {$divide: [{$arrayElemAt: [&quot;$acceptedSum.acceptedSum&quot;, 0]}, {$arrayElemAt: [&quot;$totalSum.totalSum&quot;, 0]}]},
+            cancelledRatio: {$divide: [{$arrayElemAt: [&quot;$cancelledSum.cancelledSum&quot;, 0]}, {$arrayElemAt: [&quot;$totalSum.totalSum&quot;, 0]}]},
+            rejectedRatio: {$divide: [{$arrayElemAt: [&quot;$rejectedSum.rejectedSum&quot;, 0]}, {$arrayElemAt: [&quot;$totalSum.totalSum&quot;, 0]}]}
+        }}
+
+    ], function(err, res) {
+        if (res[0]) {
+            callback(err, res[0].pendingRatio, res[0].dueRatio, res[0].acceptedRatio, res[0].cancelledRatio, res[0].rejectedRatio);
+
+        } else {
+            callback(err, []);
+        }
+    });
+};
+
+function computeAvgMinMaxStdTripsPerManager (callback) {
+    Trip.aggregate([
+        {$group: {_id: &quot;$manager&quot;, tripsPerManager: {$sum: 1}}},
+        {$group: {
+            _id: 0, 
+            avgTripsPerManager: {&quot;$avg&quot;: &quot;$tripsPerManager&quot;},
+            minTripsPerManager: {&quot;$min&quot;: &quot;$tripsPerManager&quot;},
+            maxTripsPerManager: {&quot;$max&quot;: &quot;$tripsPerManager&quot;},
+            stdTripsPerManager: {&quot;$stdDevPop&quot;: &quot;$tripsPerManager&quot;}
+        }}
+    ], function(err, res) {
+        if (res[0]) {
+            callback(err, [res[0].avgTripsPerManager, res[0].minTripsPerManager, res[0].maxTripsPerManager, res[0].stdTripsPerManager]);
+        } else {
+            callback(err, []);
+        }
+    });
+};
+
+function computeAvgMinMaxStdTripsPrice (callback) {
+    Trip.aggregate([
+        {$group: {
+            _id: 0, 
+            avgTripsPrice: {&quot;$avg&quot;: &quot;$price&quot;},
+            minTripsPrice: {&quot;$min&quot;: &quot;$price&quot;},
+            maxTripsPrice: {&quot;$max&quot;: &quot;$price&quot;},
+            stdTripsPrice: {&quot;$stdDevPop&quot;: &quot;$price&quot;}
+        }}
+    ], function(err, res) {
+        if (res[0]) {
+            callback(err, [res[0].avgTripsPrice, res[0].minTripsPrice, res[0].maxTripsPrice, res[0].stdTripsPrice]);
+
+        } else {
+            callback(err, []);
+        }
+    });
+};
+
+function computeAvgPriceRangeFinders (callback) {
+    Finder.aggregate([
+        {$group: {_id: 0, avgMinPrice: {&quot;$avg&quot;: &quot;$minPrice&quot;}, avgMaxPrice: {&quot;$avg&quot;: &quot;$maxPrice&quot;}}},
+
+    ], function(err, res) {
+        if (res[0]) {
+            callback(err, [res[0].avgMinPrice, res[0].avgMaxPrice]);
+        } else {
+            callback(err, []);
+        }
+    });
+};
+
+function computeTopFinderKeywords (callback) {
+    Finder.aggregate([
+        {$match: {keyword: {$exists: true}}},
+        {$group: {_id: &quot;$keyword&quot;, total: {$sum: 1}}},
+        {$sort: {&quot;total&quot;: -1}},
+        {$limit: 10}
+
+    ], function(err, res) {
+        if (res[0]) {
+            callback(err, res[0]._id);
+        } else {
+            callback(err, []);
+        }
+    });
+};
+
+async function computeCube () {
+    tripAppsByPeriod = []
+
+    // Months
+    for (var i = 1; i &lt; 37; i++) {
+        period = &quot;M&quot;
+        if (i &lt; 10) {
+            period += &quot;0&quot; + i;
+
+        } else {
+            period += i;
+        }
+        var initialDate = new Date();
+        initialDate.setMonth(initialDate.getMonth - i);
+
+        tripAppsByPeriod.push(TripApplication.aggregate([
+            {$match: {status: &quot;ACCEPTED&quot;, paidDate: {$gte: initialDate}}},
+            {$group: {_id: &quot;$explorer&quot;, trips: {$push: &quot;$trip&quot;}}},
+            {$project: {_id: &quot;$_id&quot;, trips: &quot;$trips&quot;, period: period}}
+        ]).exec());
+    }
+
+    // Years
+    for (var i = 1; i &lt; 4; i++) {
+        period = &quot;Y0&quot; + i
+    
+        var initialDate = new Date();
+        initialDate.setMonth(initialDate.getFullYear - i);
+
+        tripAppsByPeriod.push(TripApplication.aggregate([
+            {$match: {status: &quot;ACCEPTED&quot;, paidDate: {$gte: initialDate}}},
+            {$group: {_id: &quot;$explorer&quot;, trips: {$push: &quot;$trip&quot;}}},
+            {$project: {_id: &quot;$_id&quot;, trips: &quot;$trips&quot;, period: period}}
+        ]).exec());
+    }
+
+    // Solve promises
+    Promise.all(tripAppsByPeriod).then((obtainedTripAppsByPeriod) =&gt; { // All the applications for every month [{explorer, trips, period}]
+        var tripsByTripApps = []
+        obtainedTripAppsByPeriod.map((tripApplications, index) =&gt; {  // All the applications for one month [{explorer, trips}]
+            tripApplications.map((tripApplication) =&gt; { // {explorer, trips}
+                tripsByTripApps.push(Trip.aggregate([
+                    {$match: {_id: {$in: tripApplication.trips}}},
+                    {$group: {_id: tripApplication._id, money: {$sum: &quot;$price&quot;}}},
+                    {$project: {_id: tripApplication._id, money: &quot;$money&quot;, period: tripApplication.period}}
+                ]).exec())
+            });
+            Promise.all(tripsByTripApps).then((result) =&gt; {
+                result.map((res) =&gt; {
+                    var cube = new Cube({&quot;explorer&quot;: res[0]._id, &quot;money&quot;: res[0].money, &quot;period&quot;: res[0].period})
+                    cube.save(function(err, cube) {
+                    });
+                })
+            });
+        });
+    });
+}
+
+function validatePeriod(string) {
+    return /^M0[1-9]|M1[0-9]|M2[0-9]|M3[0-6]|Y0[1-3]$/.test(string);
+}
+
+function validateComparator(string) {
+    return /^==|!=|&gt;|&gt;=|&lt;|&lt;=$/.test(string);
+}
+
+exports.getCube = function(req, res) {
+
+    if (req.query.period &amp;&amp; req.query.explorerId &amp;&amp; validatePeriod(req.query.period)) {
+        Cube.findOne({explorer: req.query.explorerId, period: req.query.period}, function(err, cube) {
+            if (err) {
+                res.status(500).send(err);
+    
+            } else if (!cube) {
+                res.status(404).send({message: &quot;No data found for the given params.&quot;});
+            
+            } else {
+                res.json(cube);
+            }
+        });
+
+    } else {
+        res.status(422).send({message: &quot;Invalid period format.&quot;})
+    }
+};
+
+exports.getCubeAdvanced = async function (req, res) {
+
+    if (req.query.period &amp;&amp; req.query.comparator &amp;&amp; req.query.value &amp;&amp; validatePeriod(req.query.period) &amp;&amp; validateComparator(req.query.comparator)) {
+        const table = new Table({
+            dimensions: [&#039;period&#039;, &#039;explorer&#039;],
+            fields: [&#039;money&#039;],
+        });
+
+        Cube.find({period: req.query.period}, function (err, results) {
+            if (err) {
+                res.status(500).send(err);
+
+            } else if (!results) {
+                res.status(404).send({message: &quot;No cube found.&quot;});
+
+            } else {
+                rows = []
+                results.map((row) =&gt; {
+                    rows.push([row.period, row.explorer, row.money])
+                });
+
+                const table2 = table.addRows({
+                    header: [&#039;period&#039;, &#039;explorer&#039;, &#039;money&#039;],
+                    rows: rows
+                });
+
+                explorers = table2.rows
+                    .filter(row =&gt; eval(row[2] + req.query.comparator + req.query.value))
+                    .flatMap(row =&gt; {
+                        return {
+                            period: row[0],
+                            explorer: row[1],
+                            money: row[2]
+                        }
+                    });
+
+                res.json(explorers);
+            }
+        });
+
+    } else {
+        res.status(422).send({message: &quot;Invalid period format.&quot;})
+    }
+}</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ cyclomatic }} <br>
+    Length : {{ halstead.length }} <br>
+    Difficulty : {{ halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

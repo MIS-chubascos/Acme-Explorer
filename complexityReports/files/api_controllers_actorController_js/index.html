@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - api\controllers\actorController.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>api\controllers\actorController.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">68.55</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">382</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">54.25</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.23</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;;
+
+var mongoose = require(&#039;mongoose&#039;),
+    Actor = mongoose.model(&#039;Actors&#039;),
+    TripApplication = mongoose.model(&#039;TripApplications&#039;),
+    Trip = mongoose.model(&#039;Trip&#039;),
+    Sponsorship = mongoose.model(&#039;Sponsorships&#039;);
+var authController = require(&#039;./authController&#039;)
+var admin = require(&#039;firebase-admin&#039;);
+var finderController = require(&#039;./finderController&#039;);
+
+exports.listAllActors = function (req, res) {
+    Actor.find({}, function (err, actors) {
+        if (err) {
+            res.send(err);
+        }
+        else {
+            res.json(actors);
+        }
+    });
+};
+
+
+exports.createAnActor = function (req, res) {
+    var newActor = new Actor(req.body);
+    newActor.save(function (error, actor) {
+        if (error) {
+            res.send(error);
+        }
+        else {
+            res.json(actor);
+        }
+    });
+};
+
+//Only adm can create manager actors
+exports.createAnActorVerified = async function(req, res){
+    var newActor = new Actor(req.body);
+
+    if(newActor.actorType.includes(&#039;MANAGER&#039;)){
+        var idToken = req.headers[&#039;idtoken&#039;];
+        if(idToken === null || idToken === 0){
+            res.status(403).send(&#039;Only administrators can create managers. Log in&#039;);
+        }
+        else{
+            var authUser = await authController.getUserId(idToken);
+            Actor.findById(authUser, function(err, actorLoged){
+                if(err){
+                    res.send(err);
+                }
+                else{
+                    if(actorLoged.actorType.includes(&#039;ADMINISTRATOR&#039;)){
+                        newActor.save(function(err,saveActor){
+                            if(err){
+                                res.send(err);
+                            }
+                            else{
+                                res.json(saveActor);
+                            } 
+                        });
+                    }
+                    else{
+                        res.status(403).send(&#039;Only administrators can create managers&#039;)
+                    }
+                }
+            });
+        }
+    }
+    else if(newActor.actorType.includes([&#039;EXPLORER&#039;])){
+        finderController.createFinder(newActor.actorId);
+        newActor.save(function(err, saveActor){
+            if(err){
+                res.send(err);
+            }
+            else{
+                res.json(saveActor);
+            }
+        })
+    }
+    else{
+        newActor.save(function(err, saveActor){
+            if(err){
+                res.send(err);
+            }
+            else{
+                res.json(saveActor);
+            }
+        })
+    }
+}
+
+exports.readAnActor = function (req, res) {
+    Actor.findById(req.params.actorId, function (err, actor) {
+        if (err || !actor) {
+            res.send(err);
+        }
+        else {
+            res.json(actor);
+        }
+    });
+};
+
+//This method updates the profile
+exports.updateAnActor = function (req, res) {
+    Actor.findById(req.params.actorId, function (err, actor) {
+        if (err /*|| !actor*/) {
+            res.status(500).send(err);
+        } else {
+            Actor.findOneAndUpdate({ _id: req.params.actorId }, req.body,
+                {new: true,
+                    upsert: true,
+                    setDefaultsOnInsert: true,
+                    runValidators: true,
+                    context: &#039;query&#039;
+            }, function (err, actor) {
+                if (err) {
+                    res.status(500).send(err);
+                }
+                else {
+                    res.json(actor);
+                }
+            });
+        }
+    });
+};
+
+
+exports.updateAnActorVerified = function(req,res){
+    //Actors can update themselves, admin can update anyone
+    Actor.findById(req.params.actorId, async function(err,actor){
+        if(err || !actor){
+            res.send(err);
+        }else{
+            var idToken = req.headers[&#039;idtoken&#039;]; //custom token in req.header created by FB
+            if(actor.actorType.includes(&#039;MANAGER&#039;)||actor.actorType.includes(&#039;EXPLORER&#039;)||actor.actorType.includes(&#039;SPONSOR&#039;)){
+                var authUserId = await authController.getUserId(idToken);
+                if(authUserId == req.params.actorId){
+                    Actor.findOneAndUpdate({_id:req.params.actorId},{name: req.body.name, 
+                        surname: req.body.surname, 
+                        phoneNumber: req.body.phoneNumber, 
+                        address: req.body.address, 
+                        password: req.body.password},
+                    {new: true,
+                        upsert: true,
+                        setDefaultsOnInsert: true,
+                        runValidators: true,
+                        context: &#039;query&#039;
+                }, function (err, actor){
+                    if(err){
+                        res.send(err);
+                    }else{
+                        res.json(actor);
+                    }
+                });
+                }else{
+                    res.status(403); //Authentication error
+                    res.send(&#039;The actor is not authorised to update other than himself&#039;);
+                }
+            }else if(actor.actorType.includes(&#039;ADMINISTRATOR&#039;)){
+                Actor.findOneAndUpdate({_id:req.params.actorId},req.body,{new:true},function(err,res){
+                    if(err){
+                        res.send(err);
+                    }else{
+                        res.json(actor);
+                    }
+                });
+            }else{
+                res.status(405); //Not allowed
+                res.send(&#039;Actor has undentified roles&#039;);
+            }
+        }               
+    });
+}
+
+/*
+//Only admin can delete actors. Async function needed for authController method
+exports.deleteAnActor = async function (req, res) { 
+    var idToken = req.headers[&#039;idtoken&#039;];
+    var authenticatedUserId = await authController.getUserId(idToken)
+    var actorAuth = actor.findById(authenticatedUserId);
+    if(actorAuth.actorType.includes(&#039;ADMINISTRATOR&#039;)){
+        Actor.remove({
+            _id: req.params.actorId
+        }, function (err, actor) {
+            if (err) {
+                res.send(err);
+            }
+            else {
+                res.json({ message: &#039;actor successfully deleted&#039; });
+            }
+        });
+    };
+}
+*/
+
+exports.deleteAnActorV1 = function(req,res){
+    Actor.remove({_id: req.params.actorId}, function(err,actor){
+        if(err){
+            res.send(err);
+        }
+        else{
+            res.json({ message: &#039;actor successfully deleted&#039; });
+        }
+    })
+}
+
+// Checked admin on routes
+exports.deleteAnActorV2 = async function (req, res) { 
+    var actorForErase = Actor.findById(req.params.actorId);
+    if(actorForErase != null){
+        if(actorForErase.actorType.includes(&#039;EXPLORER&#039;)){
+            finderController.deleteFinder(actorForErase.actorId)
+        }
+    }
+    Actor.remove({
+            _id: req.params.actorId
+        }, function (err, actor) {
+            if (err) {
+                res.send(err);
+            }
+            else {
+                res.json({ message: &#039;actor successfully deleted&#039; });
+            }
+        });
+};
+
+
+
+
+exports.getTripApplicationsByActorV1 = function(req, res) {
+    var query = {};
+
+    if (req.query.explorer == &quot;true&quot;) {
+        query.explorer = req.params.actorId;
+
+    } else {
+        query.manager = req.params.actorId;
+    }
+
+    TripApplication.find(query).sort({status: &#039;asc&#039;}).exec(function(err, tripApplications) {
+        if (err) {
+            res.status(500).send(err);
+
+        } else {
+            res.send(tripApplications);
+        }
+    });
+};
+
+exports.getTripApplicationsByActorV2 = async function(req, res) {
+    var idToken = req.headers[&#039;idToken&#039;];
+    var authenticatedActorId = await authController.getUserId(idToken);
+
+    var query = {};
+
+    if (req.query.explorer == &quot;true&quot;) {
+        query.explorer = req.params.actorId;
+
+    } else {
+        query.manager = req.params.actorId;
+    }
+
+    if (req.params.actorId == authenticatedActorId) {
+        TripApplication.find(query).sort({status: &#039;asc&#039;}).exec(function(err, tripApplications) {
+            if (err) {
+                res.status(500).send(err);
+    
+            } else {
+                res.send(tripApplications);
+            }
+        });
+    }
+};
+
+exports.getManagerTripsV1 = function (req, res) {
+    var query = { &#039;manager&#039;: req.params.actorId }
+    Trip.find(query, function (err, trips) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.json(trips);
+        }
+    })
+}
+
+exports.getManagerTripsV2 = async function (req, res) {
+    var idToken = req.headers[&#039;idToken&#039;];
+    var authenticatedActorId = await authController.getUserId(idToken);
+    var query = { &#039;manager&#039;: req.params.actorId }
+    if (req.params.actorId == authenticatedActorId) {
+    Trip.find(query, function (err, trips) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.json(trips);
+        }
+    })
+    } else {
+        res.status(403);
+        res.json({message: &#039;Forbidden. A manager can only see all the trips created by himself.&#039;, error: err});
+    }
+}
+
+exports.getSponsorSponsorshipsV1 = function (req, res) {
+    var query = { &#039;sponsor&#039;: req.params.actorId }
+    Sponsorship.find(query, function (err, sponsorships) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.json(sponsorships);
+        }
+    })
+}
+
+exports.getSponsorSponsorshipsV2 = async function (req, res) {
+    var idToken = req.headers[&#039;idToken&#039;];
+    var authenticatedActorId = await authController.getUserId(idToken);
+    var query = { &#039;sponsor&#039;: req.params.actorId }
+    if (req.params.actorId == authenticatedActorId) {
+        Sponsorship.find(query, function (err, sponsorships) {
+        if (err) {
+            res.send(err);
+        } else {
+            res.json(sponsorships);
+        }
+    })
+    } else {
+        res.status(403);
+        res.json({message: &#039;Forbidden. A sponsor can only see all the sponsorships created by himself.&#039;, error: err});
+    }
+}
+
+
+
+
+/** Login method */
+
+exports.loginAnActor = async function (req, res) {
+    console.log(&#039;starting login&#039;);
+    var emailParam = req.query.email;
+    var password = req.query.password;
+    Actor.findOne({ email: emailParam }, function (err, actor) {
+        if (err) { res.send(err); }
+
+        // Wrong email provided
+        else if (!actor) {
+            res.status(401); //access token not provided or invalid
+            res.json({ message: &#039;forbidden&#039;, error: err });
+        }
+
+        else if (actor.banned == true) {
+            res.status(403); //access token valid. User is banned
+            res.json({ message: &#039;forbidden&#039;, error: err });
+        }
+        else {
+            // Check the pWord
+            console.log(&#039;actorController pWord: &#039;+password);
+            actor.verifyPassword(password, async function (err, isMatch) {
+                if (err) {
+                    res.send(err);
+                }
+
+                // Password mismatch
+                else if (!isMatch) {
+                    res.status(401); //access token not provided or invalid
+                    res.json({ message: &#039;forbidden&#039;, error: err });
+                }
+
+                else {
+                    try {
+                        var customToken = await admin.auth().createCustomToken(actor.email);
+                    } catch (error) {
+                        console.log(&quot;Error creating custom token:&quot;, error);
+                    }
+                    actor.customToken = customToken;
+                    console.log(&#039;Login Success... sending JSON with custom token&#039;);
+                    res.json(actor);
+                }
+            });
+        }
+    });
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ cyclomatic }} <br>
+    Length : {{ halstead.length }} <br>
+    Difficulty : {{ halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

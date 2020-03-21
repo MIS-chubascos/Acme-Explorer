@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - api\controllers\finderController.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>api\controllers\finderController.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">67.42</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">143</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">31.86</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.47</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;;
+
+var mongoose = require(&#039;mongoose&#039;),
+cache = require(&#039;memory-cache&#039;),
+Finder = mongoose.model(&#039;Finders&#039;),
+Config = mongoose.model(&#039;Config&#039;);
+var tripController = require(&#039;./tripController&#039;);
+var authController = require(&#039;./authController&#039;);
+
+exports.getFinderV1 = function(req, res) {
+    Finder.findById(req.params.finderId, function(err, finder) {
+        if (err) {
+            res.status(500).send(err);
+        
+        } else if (!finder) {
+            res.status(404).send({message: &quot;No finder found for the given ID&quot;});
+
+        } else {
+            res.json(finder);
+        }
+    });
+};
+
+exports.getFinderV2 = async function(req, res) {
+    var idToken = req.headers[&#039;idToken&#039;];
+    var authenticatedActorId = await authController.getUserId(idToken);
+
+    Finder.findById(req.params.finderId, function(err, finder) {
+        if (err) {
+            res.status(500).send(err);
+
+        } else if (!finder) {
+            res.status(404).send({message: &quot;No finder found for the given ID&quot;});
+
+        } else {
+            if (authenticatedActorId == finder.explorer) {
+                res.json(finder);
+
+            } else {
+                res.status(403).send({message: &#039;You can only display your own finder.&#039;});
+            }
+        }
+    });
+};
+
+exports.updateFinderV1 = function(req, res) {
+    Finder.findOneAndUpdate({_id: req.params.finderId}, req.body, {new: true}, function(err, finder) {
+        if (err) {
+            res.status(500).send(err);
+        
+        } else if (!finder) {
+            res.status(404).send({message: &quot;No finder found for the given ID&quot;});
+
+        } else {
+            cache.del(&quot;tripsByFinder&quot;);
+            res.json(finder);
+        }
+    });
+};
+
+exports.updateFinderV2 = async function(req, res) {
+    var idToken = req.headers[&#039;idToken&#039;];
+    var authenticatedActorId = await authController.getUserId(idToken);
+
+    if (authenticatedActorId == req.body.explorer) {
+        Finder.findOneAndUpdate({_id: req.params.finderId}, req.body, {new: true}, function(err, finder) {
+            if (err) {
+                res.status(500).send(err);
+
+            } else if (!finder) {
+                res.status(404).send({message: &quot;No finder found for the given ID&quot;});
+
+            } else {
+                cache.del(&quot;tripsByFinder&quot;);
+                res.json(finder);
+            }
+        });
+
+    } else {
+        res.status(403).send({message: &#039;You can only update your own finder.&#039;});
+    }
+};
+
+exports.getTripsByFinderV1 = async function(req, res) {
+    var config = await Config.findOne({}).exec();
+    var finder = await Finder.findById(req.params.finderId).exec();
+    var cachedResults = cache.get(&quot;tripsByFinder&quot;);
+
+    if (!finder) {
+        res.status(404).send({message: &quot;No finder found for the given ID&quot;});
+
+    } else if (!cachedResults) {
+        var finderResults = await tripController.searchTrips(finder.keyword, finder.minPrice, finder.maxPrice, finder.startDate, finder.endDate);
+        cache.put(&quot;tripsByFinder&quot;, finderResults, config.finderCacheTime * 3600000);
+        res.json(finderResults.slice(0, config.finderMaxResults));
+        
+    } else {
+        res.json(cachedResults.slice(0, config.finderMaxResults));
+    }
+};
+
+exports.getTripsByFinderV2 = async function(req, res) {
+    var idToken = req.headers[&#039;idToken&#039;];
+    var authenticatedActorId = await authController.getUserId(idToken);
+
+    var config = await Config.findOne({}).exec();
+    var finder = await Finder.findById(req.params.finderId).exec();
+    var cachedResults = cache.get(&quot;tripsByFinder&quot;);
+
+    if (!finder) {
+        res.status(404).send({message: &quot;No finder found for the given ID&quot;});
+
+    } else if (authenticatedActorId == finder.explorer) {
+        if (!cachedResults) {
+            var finderResults = await tripController.searchTrips(finder.keyword, finder.minPrice, finder.maxPrice, finder.startDate, finder.endDate);
+            cache.put(&quot;tripsByFinder&quot;, finderResults, config.finderCacheTime * 3600000);
+            res.json(finderResults.slice(0, config.finderMaxResults));
+            
+        } else {
+            res.json(cachedResults.slice(0, config.finderMaxResults));
+        }
+    
+    } else {
+        res.status(403).send({message: &#039;You can only make searchs with your own finder.&#039;});
+    }
+};
+
+
+
+
+
+exports.createFinder = function(explorerId) {
+    var newFinder = new Finder();
+    newFinder.explorer = explorerId;
+
+    newFinder.save(function(err, finder) {
+        return finder;
+    });
+};
+
+exports.deleteFinder = function(explorerId) {
+    Finder.remove({explorer: explorerId}, function(err, finder) {});
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ cyclomatic }} <br>
+    Length : {{ halstead.length }} <br>
+    Difficulty : {{ halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

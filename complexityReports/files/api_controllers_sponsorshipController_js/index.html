@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - api\controllers\sponsorshipController.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>api\controllers\sponsorshipController.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">71.18</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">131</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">36.20</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">1.43</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&#039;use strict&#039;;
+
+var mongoose = require(&#039;mongoose&#039;),
+    Sponsorship = mongoose.model(&#039;Sponsorships&#039;);
+
+var authController = require(&#039;./authController&#039;);
+var actorController = require(&#039;./actorController&#039;);
+
+
+exports.createSponsorship = async function(req,res){
+    var newSponsorship = new Sponsorship(req.body);
+    newSponsorship.save(function(err,sponsorship){
+        if(err){
+            if(err.name==&#039;ValidationError&#039;){
+                res.status(422).send(err);
+            }else{
+                res.status(500).send(err);
+            }
+        }else{
+            res.json(sponsorship);
+        }
+    });
+}
+
+exports.getSponsorshipV1 = function(req,res){
+    Sponsorship.findById(req.params.sponsorshipId, function(err, sponsorship){
+        if(err || sponsorship == null){
+            res.status(500).send(&quot;Error finding sponsorship with id &quot; + String(req.params.sponsorshipId));
+        }else{
+            res.json(sponsorship);
+        }
+    });
+}
+
+exports.getSponsorshipV2 = async function(req,res){
+    var idToken = req.headers[&#039;idToken&#039;];
+    var authenticatedActorId = await authController.getUserId(idToken);
+
+    if (authenticatedActorId == req.body.sponsor) {
+        Sponsorship.findById(req.params.sponsorshipId, function(err, sponsorship){
+            if(err || sponsorship == null){
+                res.status(500).send(&quot;Error finding sponsorship with id &quot; + String(req.params.sponsorshipId));
+            }else{
+                res.json(sponsorship);
+            }
+        });
+    } else {
+        res.status(403);
+        res.json({message: &#039;Forbidden. More privileges are required.&#039;,error: err});
+    }
+}
+
+exports.deleteSponsorshipV1 = async function (req, res) {
+    Sponsorship.findById(req.params.sponsorshipId, function (err, sponsorship) {
+        if (err || sponsorship == null) {
+            res.send(&quot;Error finding sponsorship with id &quot; + String(req.params.sponsorshipId));
+        } else {
+            Sponsorship.findOneAndDelete({ _id: req.params.sponsorshipId }, function (err, sponsorship) {
+                if (err || sponsorship == null) {
+                    res.send(&quot;Error finding sponsorship with id &quot; + String(req.params.sponsorshipId));
+                } else {
+                    res.json({ message: &#039;Sponsorship successfully removed.&#039; })
+                }
+            })
+        }
+    });
+}
+
+exports.deleteSponsorshipV2 = async function (req, res) {
+    var idToken = req.headers[&#039;idToken&#039;];
+    var authenticatedActorId = await authController.getUserId(idToken);
+
+    if (authenticatedActorId == req.body.sponsor) {
+        Sponsorship.findById(req.params.sponsorshipId, function (err, sponsorship) {
+            if (err || sponsorship == null) {
+                res.send(&quot;Error finding sponsorship with id &quot; + String(req.params.sponsorshipId));
+            } else {
+                Sponsorship.findOneAndDelete({ _id: req.params.sponsorshipId }, function (err, sponsorship) {
+                    if (err || sponsorship == null) {
+                        res.send(&quot;Error finding sponsorship with id &quot; + String(req.params.sponsorshipId));
+                    } else {
+                        res.json({ message: &#039;Sponsorship successfully removed.&#039; })
+                    }
+                })
+            }
+        });
+    } else {
+        res.status(403);
+        res.json({message: &#039;Forbidden. More privileges are required.&#039;,error: err});
+    }
+}
+
+exports.updateSponsorshipV1 = async function(req,res){
+    Sponsorship.findOneAndUpdate({_id: req.params.sponsorshipId}, req.body, {new:true}, function(err,sponsorship){
+        if(err || sponsorship == null){
+            res.status(500).send(&quot;Error finding sponsorship with id &quot; + String(req.params.sponsorshipId));
+        }else{
+            res.json(sponsorship);
+        }
+    });
+}
+
+exports.updateSponsorshipV2 = async function(req,res){
+    var idToken = req.headers[&#039;idToken&#039;];
+    var authenticatedActorId = await authController.getUserId(idToken);
+
+    if (authenticatedActorId == req.body.sponsor) {
+        Sponsorship.findOneAndUpdate({_id: req.params.sponsorshipId}, req.body, {new:true}, function(err,sponsorship){
+            if(err || sponsorship == null){
+                res.status(500).send(&quot;Error finding sponsorship with id &quot; + String(req.params.sponsorshipId));
+            }else{
+                res.json(sponsorship);
+            }
+        });
+    } else {
+        res.status(403);
+        res.json({message: &#039;Forbidden. More privileges are required.&#039;,error: err});
+    }
+}
+
+exports.getTripRandomSponsorship = function(req,res){
+    var tripId = req.params.tripId;
+    Sponsorship.find({ &quot;trip&quot;: tripId, &quot;payed&quot;: true }, function(err, sponsorships){
+        if(err){
+            res.status(500).send(err);
+        }else{
+            var sponsorship = sponsorships[Math.floor(Math.random() * sponsorships.length)]
+            res.json({ &quot;banner&quot;: sponsorship.banner, &quot;url&quot;: sponsorship.url });
+        }
+    })
+}</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ cyclomatic }} <br>
+    Length : {{ halstead.length }} <br>
+    Difficulty : {{ halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
