@@ -22,3 +22,15 @@ To generate the reports, open the terminal and execute the following commands:
 This will generate an *html* report that you can find in the folder *complexityReports*.
 
 This feature has been implemented thanks to *plato* library.
+
+
+## Hash the user's password [ A+ ]
+
+The package needed is installed by the following command:
+* `npm install bcrypt`
+
+In short terms, this package makes you able to hash the user's password generating your own salt and hash. 
+
+In cryptography, a salt is random data that is used as an additional input to a one-way function that hashes data.
+
+Checkout actorModel at line 48 and below.
