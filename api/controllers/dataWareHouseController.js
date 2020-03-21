@@ -551,7 +551,10 @@ exports.getCubeAdvanced = async function (req, res) {
                         }
                     });
 
-                res.json(explorers);
+                const explorersSet = [...new Set(explorers.map(e => JSON.stringify(e)))]
+                    .map(s => JSON.parse(s));
+
+                res.json(explorersSet);
             }
         });
 
